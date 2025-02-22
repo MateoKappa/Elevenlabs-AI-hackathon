@@ -1,4 +1,4 @@
-import { Mic, Paperclip, PlusCircleIcon, SmileIcon } from "lucide-react";
+import { Mic, Paperclip, PauseCircle, PlayCircle, PlusCircleIcon, SmileIcon } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
@@ -16,8 +16,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChatMessageProps } from "@/types";
-import { useState } from "react";
+import type { ChatMessageProps } from "@/types";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useWavesurfer } from '@wavesurfer/react'
 
 export default function ChatFooter({
   messages,
@@ -27,6 +28,25 @@ export default function ChatFooter({
   setMessages: (messages: ChatMessageProps[]) => void;
 }) {
   const [inputValue, setInputValue] = useState("");
+  const [audioUrl, setAudioUrl] = useState("");
+  const containerRef = useRef<HTMLDivElement | null>(null)
+
+  const { wavesurfer, isPlaying } = useWavesurfer({
+    container: containerRef,
+    height: 44,
+    barGap: 2,
+    barRadius: 4,
+    barWidth: 3,
+    barHeight: 1,
+    waveColor: '#d1a0b5',
+    progressColor: '#a3426c',
+    cursorWidth: 0,
+    interact: true,
+    fillParent: true,
+    hideScrollbar: true,
+    url: audioUrl,
+  })
+
   const onSubmit = async () => {
     setMessages([
       ...messages,
@@ -45,13 +65,50 @@ export default function ChatFooter({
       },
       body: JSON.stringify({ userMessage: inputValue }),
     });
-
-    const data = await response.json();
-    console.log(data, "data");
+    if (response.ok) {
+      const res = await response.blob()
+      setAudioUrl(URL.createObjectURL(res))
+    }
   };
+
+  const playPause = useCallback(() => {
+    if (!wavesurfer) return
+
+    console.log('isPlaying', isPlaying)
+    if (isPlaying) wavesurfer.pause()
+    else wavesurfer.play()
+  }, [isPlaying, wavesurfer])
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    if (!wavesurfer) return
+
+    wavesurfer.on('interaction', () => {
+      wavesurfer.play()
+    })
+    wavesurfer.on('finish', () => {
+      wavesurfer.stop()
+    })
+
+    return () => {
+      wavesurfer.destroy()
+    }
+  }, [wavesurfer])
 
   return (
     <>
+      <div className="flex flex-col">
+        {audioUrl && (
+          <div className="mt-3 flex flex-row items-center gap-1 rounded-full border border-bright-plum-50 bg-bright-plum-7 px-3 py-1 text-sm">
+            <button className="shrink-0 text-bright-plum" type="button" onClick={playPause}>
+              {isPlaying ? <PauseCircle size={32} /> : <PlayCircle size={32} />}
+            </button>
+
+            <div className="ml-1 h-full w-full" ref={containerRef} />
+          </div>
+        )}
+      </div>
+
       <Card>
         <CardContent className="p-2 lg:p-4 flex items-center relative">
           <Input

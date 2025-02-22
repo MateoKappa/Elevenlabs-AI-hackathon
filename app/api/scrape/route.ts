@@ -60,45 +60,59 @@ export async function POST(req: Request) {
     const content = scrapeResult.data.content;
     console.log({ content });
 
-    const { text } = await generateText({
-      model: mistral("mistral-large-latest"),
-      prompt: `
-      Convert the content of the news article into a nice conversation between two people in a podcast.
-      The conversation should be in the style of a podcast.
-      The conversation should be between two people, one of them is the host and the other is the guest.
-      The host should be the one who is asking the questions and the guest should be the one who is answering the questions.
-      The host should be the one who is introducing the guest and the guest should be the one who is answering the questions.
-      The host should be the one who is asking the questions and the guest should be the one who is answering the questions.
-      
-      ### Content
-      ${content}
-      `,
-    });
+    const response = await client.textToSpeech.convert("CYw3kZ02Hs0563khs1Fj", {
+      output_format: "mp3_44100_128",
+      text: content,
+      model_id: "eleven_multilingual_v2"
+  });
 
-    console.log({text});
-    const response = await client.studio.createPodcast({
-        model_id: "eleven_flash_v2_5",
-        mode: {
-            type: "conversation",
-            conversation: {
-                host_voice_id: "NYC9WEgkq1u4jiqBseQ9",
-                guest_voice_id: "NYC9WEgkq1u4jiqBseQ9"
-            }
-        },
-        source: {
-            text
-        }
-    });
-    console.log({response});
+  const chunks = [];
+  for await (const chunk of response) {
+    if (chunk) {
+      chunks.push(chunk)
+    }
+  }
+  const audioBuffer = Buffer.concat(chunks)
+
+  console.log({audioBuffer});
+
+    // const { text } = await generateText({
+    //   model: mistral("mistral-large-latest"),
+    //   prompt: `
+    //   Convert the content of the news article into a nice conversation between two people in a podcast.
+    //   The conversation should be in the style of a podcast.
+    //   The conversation should be between two people, one of them is the host and the other is the guest.
+    //   The host should be the one who is asking the questions and the guest should be the one who is answering the questions.
+    //   The host should be the one who is introducing the guest and the guest should be the one who is answering the questions.
+    //   The host should be the one who is asking the questions and the guest should be the one who is answering the questions.
+      
+    //   ### Content
+    //   ${content}
+    //   `,
+    // });
+
+    // console.log({text});
+    // const response = await client.studio.createPodcast({
+    //     model_id: "eleven_multilingual_v2",
+    //     mode: {
+    //         type: "conversation",
+    //         conversation: {
+    //             host_voice_id: "CYw3kZ02Hs0563khs1Fj",
+    //             guest_voice_id: "AZnzlk1XvdvUeBnXmlld"
+    //         }
+    //     },
+    //     source: [{
+    //       type: "text",
+    //       text: text
+    //     }]
+    // });
+    // console.log({response});
 
     // console.log(scrapeResult.data);
 
-    return NextResponse.json({
-      success: true,
-      data: scrapeResult.data,
-      interpretedAction: action,
-      message,
-    });
+    return new NextResponse(audioBuffer, {
+      headers: { 'Content-Type': 'audio/mpeg' },
+    })
   } catch (error) {
     console.error("Scraping error:", error);
     return NextResponse.json(
@@ -106,19 +120,4 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-}
-
-function cleanHtml(_htmlString: string) {
-  const htmlString = _htmlString
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "") // Remove script tags and contents
-    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "") // Remove style tags and contents
-    .replace(/<link\s+[^>]*>/gi, "") // Remove link tags
-    .replace(/<meta\s+[^>]*>/gi, "") // Remove meta tags
-    .replace(/<!--[\s\S]*?-->/g, "") // Remove comments
-    .replace(/\s(class|onclick|style|rel|target|data-\w+)=["'].*?["']/gi, "") // Remove common non-data attributes
-    .replace(/\s\w+=""/g, "") // Remove empty attributes
-    .replace(/\s+/g, " ") // Remove extra whitespace
-    .trim(); // Trim leading and trailing whitespace
-
-  return htmlString;
 }
