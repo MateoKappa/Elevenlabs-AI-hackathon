@@ -6,11 +6,17 @@ import { generateObject } from "ai";
 import { mistral } from "@ai-sdk/mistral";
 import * as htmlToText from "html-to-text";
 import { load } from "cheerio";
-import { ScrapeResponse } from "@mendable/firecrawl-js";
+import type { ScrapeResponse } from "@mendable/firecrawl-js";
 
 // Initialize FireCrawl
 const firecrawl = new FireCrawl({
-  apiKey: process.env.FIRECRAWL_API_KEY!,
+  apiKey: process.env.FIRECRAWL_API_KEY,
+});
+
+const schema = z.object({
+  content: z.string(),
+  title: z.string(),
+  images: z.array(z.string()),
 });
 
 export const runtime = "edge";
@@ -43,82 +49,43 @@ export async function POST(req: Request) {
           2. The specific action they want to perform`,
     });
 
-    const scrapeOptions = {
-      limit: 20,
-    };
-
-    const result = (await firecrawl.scrapeUrl(url, {
-      formats: ["html"],
-    })) as ScrapeResponse;
-
-    if (result.error || !result.html) {
-      console.log(result);
-      throw new Error("failed");
+    const scrapeResult = await firecrawl.extract([url], {
+      prompt: "Extract the content of the news article from the page along with the title and the urls from the images.",
+      schema: schema
+    });
+    
+    if (!scrapeResult.success) {
+      throw new Error(`Failed to scrape: ${scrapeResult.error}`)
     }
+    
+    console.log(scrapeResult.data);
 
-    const loadableBody = result.html.replace(/>\s*</g, "> <");
-    const $ = load(loadableBody);
-    const body = cleanHtml($("body").prop("outerHTML") || "");
+    // const result = (await firecrawl.scrapeUrl(url, {
+    //   formats: ["html"],
+    // })) as ScrapeResponse;
 
-    const images = $("img")
-      .map((_, element) => ({
-        url: $(element).attr("src"),
-        alt: $(element).attr("alt") || "",
-        width: $(element).attr("width"),
-        height: $(element).attr("height"),
-      }))
-      .get();
+    // if (result.error || !result.html) {
+    //   console.log(result);
+    //   throw new Error("failed");
+    // }
 
-    // Analyze all images together with Mistral Vision
-    const imageContent: { type: "image"; image: string }[] = images
-      .filter((img) => img.url)
-      .map((img) => ({
-        type: "image_url",
-        imageUrl: img.url || "",
-      }));
+    // const loadableBody = result.html.replace(/>\s*</g, "> <");
+    // const $ = load(loadableBody);
+    // const body = cleanHtml($("body").prop("outerHTML") || "");
 
-    const textContent = htmlToText.convert(body, {
-      selectors: [
-        { selector: "img", format: "skip" },
-        {
-          selector: "a",
-          options: { baseUrl: url },
-        },
-      ],
-    });
-
-    const response = await generateObject({
-      model: mistral("pixtral-large-latest"),
-      schema: z.object({
-        relevant_image: z.string(),
-      }),
-      system:
-        "You are a image detection assistant. Given a list of images, analyze the images and its relevance to the user's article. Return the most relevant image if there is one, otherwise return an empty string",
-      messages: [
-        {
-          role: "user",
-          content: `Here is the contect of the article: ${textContent}`,
-        },
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: "Analyze these images in the context of: " + message,
-            },
-            {
-              type: "image_url",
-              imageUrl:
-                "https://tripfixers.com/wp-content/uploads/2019/11/eiffel-tower-with-snow.jpeg",
-            },
-          ],
-        },
-      ],
-    });
+    // const textContent = htmlToText.convert(body, {
+    //   selectors: [
+    //     { selector: "img", format: "skip" },
+    //     {
+    //       selector: "a",
+    //       options: { baseUrl: url },
+    //     },
+    //   ],
+    // });
 
     return NextResponse.json({
       success: true,
-      data: result,
+      data: scrapeResult.data,
       interpretedAction: action,
       message,
     });
