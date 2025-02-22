@@ -52,7 +52,8 @@ export async function POST(req: Request) {
     })) as ScrapeResponse;
 
     if (result.error || !result.html) {
-      throw new Error(result.error);
+      console.log(result);
+      throw new Error("failed");
     }
 
     const loadableBody = result.html.replace(/>\s*</g, "> <");
@@ -69,24 +70,35 @@ export async function POST(req: Request) {
       .get();
 
     // Analyze all images together with Mistral Vision
-    const imageContent = images
+    const imageContent: { type: "image"; image: string }[] = images
       .filter((img) => img.url)
       .map((img) => ({
-        type: "image",
-        image: img.url,
+        type: "image_url",
+        imageUrl: img.url || "",
       }));
 
+    const textContent = htmlToText.convert(body, {
+      selectors: [
+        { selector: "img", format: "skip" },
+        {
+          selector: "a",
+          options: { baseUrl: url },
+        },
+      ],
+    });
+
     const response = await generateObject({
-      model: mistral("mistral-large-latest"),
+      model: mistral("pixtral-large-latest"),
       schema: z.object({
-        imageAnalysis: z.array(
-          z.object({
-            description: z.string(),
-            relevance: z.number().min(0).max(1),
-          })
-        ),
+        relevant_image: z.string(),
       }),
+      system:
+        "You are a image detection assistant. Given a list of images, analyze the images and its relevance to the user's article. Return the most relevant image if there is one, otherwise return an empty string",
       messages: [
+        {
+          role: "user",
+          content: `Here is the contect of the article: ${textContent}`,
+        },
         {
           role: "user",
           content: [
@@ -95,8 +107,8 @@ export async function POST(req: Request) {
               text: "Analyze these images in the context of: " + message,
             },
             {
-              type: "image",
-              image:
+              type: "image_url",
+              imageUrl:
                 "https://tripfixers.com/wp-content/uploads/2019/11/eiffel-tower-with-snow.jpeg",
             },
           ],
@@ -104,15 +116,9 @@ export async function POST(req: Request) {
       ],
     });
 
-    const imagesWithAnalysis = images.map((img, index) => ({
-      ...img,
-      analysis: response.object.imageAnalysis[index],
-    }));
-
     return NextResponse.json({
       success: true,
       data: result,
-      images: imagesWithAnalysis,
       interpretedAction: action,
       message,
     });
