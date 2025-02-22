@@ -1,4 +1,4 @@
-import { featureList } from "@/@data/features";
+import { featureList } from "@/data/features";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Icon } from "@/components/ui/extras/icon";
 import { icons } from "lucide-react";

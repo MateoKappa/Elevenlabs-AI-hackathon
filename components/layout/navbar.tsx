@@ -25,7 +25,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ToggleTheme } from "./toogle-theme";
 import Logo from "./logo";
-import { productList, routeList } from "@/@data/navbar";
+import { productList, routeList } from "@/data/navbar";
 import { Icon } from "../ui/extras/icon";
 
 export const Navbar = () => {

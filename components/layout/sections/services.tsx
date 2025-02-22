@@ -1,4 +1,4 @@
-import { ProService, serviceList } from "@/@data/services";
+import { ProService, serviceList } from "@/data/services";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,

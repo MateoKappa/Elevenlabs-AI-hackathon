@@ -1,4 +1,4 @@
-import { plans, PopularPlan } from "@/@data/pricing";
+import { plans, PopularPlan } from "@/data/pricing";
 import { Button } from "@/components/ui/button";
 import {
   Card,

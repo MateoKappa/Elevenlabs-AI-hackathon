@@ -1,4 +1,4 @@
-import { benefitList } from "@/@data/benefits";
+import { benefitList } from "@/data/benefits";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Icon } from "@/components/ui/extras/icon";
 import { cn } from "@/lib/utils";

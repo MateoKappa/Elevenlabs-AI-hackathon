@@ -1,0 +1,40 @@
+[
+  {
+    "id": 1,
+    "images": ["/images/image4.jpg", "/images/image2.jpg"],
+    "date": "40 minutes ago",
+    "read": true,
+    "user_id": 1
+  },
+  {
+    "id": 2,
+    "images": [
+      "/images/image2.jpg",
+      "/images/image1.jpg",
+      "/images/image3.jpg",
+      "/images/image4.jpg"
+    ],
+    "date": "5 hours ago",
+    "read": false,
+    "user_id": 2
+  },
+  {
+    "id": 3,
+    "images": ["/images/image3.jpg", "/images/image2.jpg"],
+    "date": "13 hours ago",
+    "read": false,
+    "user_id": 3
+  },
+  {
+    "id": 4,
+    "name": "Cobb Fentem",
+    "images": [
+      "/images/image5.jpg",
+      "/images/image2.jpg",
+      "/images/image3.jpg"
+    ],
+    "date": "20 hours ago",
+    "read": false,
+    "user_id": 4
+  }
+]

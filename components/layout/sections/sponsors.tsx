@@ -1,4 +1,4 @@
-import { sponsors } from "@/@data/sponsors";
+import { sponsors } from "@/data/sponsors";
 import { Icon } from "@/components/ui/extras/icon";
 import { Marquee } from "@devnomic/marquee";
 import { icons } from "lucide-react";

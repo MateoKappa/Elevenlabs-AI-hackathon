@@ -1,4 +1,4 @@
-import { teamList } from "@/@data/teams";
+import { teamList } from "@/data/teams";
 import GithubIcon from "@/components/icons/github-icon";
 import LinkedInIcon from "@/components/icons/linkedin-icon";
 import XIcon from "@/components/icons/x-icon";

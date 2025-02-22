@@ -1,4 +1,4 @@
-import { FAQList } from "@/@data/faq";
+import { FAQList } from "@/data/faq";
 import {
   Accordion,
   AccordionContent,

@@ -1,4 +1,6 @@
+"use client";
 import { Inter, Bricolage_Grotesque } from "next/font/google";
+import { usePathname } from "next/navigation";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/layout/navbar";
@@ -15,6 +17,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  const showNavbar = pathname === "/";
+
   return (
     <html lang="pt-br" suppressHydrationWarning>
       <body
@@ -30,7 +35,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
+          {showNavbar && <Navbar />}
 
           {children}
         </ThemeProvider>
