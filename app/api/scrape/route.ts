@@ -4,14 +4,17 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { generateObject } from "ai";
 import { mistral } from "@ai-sdk/mistral";
-import * as htmlToText from "html-to-text";
-import { load } from "cheerio";
-import { ScrapeResponse } from "@mendable/firecrawl-js";
 import { openai } from "@ai-sdk/openai";
 
 // Initialize FireCrawl
 const firecrawl = new FireCrawl({
-  apiKey: process.env.FIRECRAWL_API_KEY!,
+  apiKey: process.env.FIRECRAWL_API_KEY,
+});
+
+const schema = z.object({
+  content: z.string(),
+  title: z.string(),
+  images: z.array(z.string()),
 });
 
 export const runtime = "edge";
@@ -44,116 +47,93 @@ export async function POST(req: Request) {
           2. The specific action they want to perform`,
     });
 
-    const result = (await firecrawl.scrapeUrl(url, {
-      formats: ["html"],
-    })) as ScrapeResponse;
-
-    if (result.error || !result.html) {
-      console.log(result);
-      throw new Error("failed");
-    }
-
-    const loadableBody = result.html.replace(/>\s*</g, "> <");
-    const $ = load(loadableBody);
-    const body = cleanHtml($("body").prop("outerHTML") || "");
-
-    const images = $("img")
-      .map((_, element) => ({
-        url: $(element).attr("src"),
-        alt: $(element).attr("alt") || "",
-        width: $(element).attr("width"),
-        height: $(element).attr("height"),
-        extension:
-          $(element).attr("src")?.split(".").pop()?.toLowerCase() || "",
-      }))
-      .get();
-
-    const validImageFormats = ["png", "jpeg", "jpg", "gif", "webp"];
-    const imageContent: { type: "image"; image: string }[] = images
-      .filter(
-        (
-          img
-        ): img is {
-          url: string;
-          alt: string;
-          width: string | undefined;
-          height: string | undefined;
-          extension: string;
-        } => {
-          console.log(img.extension, "extension22");
-          if (typeof img.url !== "string" || img.url.trim() === "")
-            return false;
-          const extension = img.url.split(".").pop()?.toLowerCase() || "";
-          return validImageFormats.some((format) => extension.includes(format));
-        }
-      )
-      .map((img) => ({
-        type: "image",
-        image: img.url,
-      }));
-
-    const textContent = htmlToText.convert(body, {
-      selectors: [
-        { selector: "img", format: "skip" },
-        {
-          selector: "a",
-          options: { baseUrl: url },
-        },
-      ],
+    const scrapeResult = await firecrawl.extract([url], {
+      prompt:
+        "Extract the content of the news article from the page along with the title and the urls from the images.",
+      schema: schema,
     });
 
-    const response = await generateObject({
-      model: openai("gpt-4o-mini"),
-      schema: z.object({
-        success: z.boolean(),
-        relevant_image: z.string(),
-        description: z.string(),
-      }),
-      system: `You are an image detection assistant. You will receive a list of images with their URLs.
+    if (!scrapeResult.success) {
+      throw new Error(`Failed to scrape: ${scrapeResult.error}`);
+    }
+
+    const validImageFormats = ["png", "jpeg", "jpg", "gif", "webp"];
+    const imageContent: { type: "image"; image: string }[] =
+      scrapeResult.data.images
+        .filter((img) => {
+          return (
+            img &&
+            img.startsWith("http") &&
+            validImageFormats.some((format) =>
+              img.toLowerCase().endsWith(format)
+            )
+          );
+        })
+        .map((img) => ({
+          type: "image",
+          image: img,
+        }));
+
+    try {
+      const response = await generateObject({
+        model: openai("gpt-4o-mini"),
+        schema: z.object({
+          success: z.boolean(),
+          relevant_image: z.string(),
+        }),
+        system: `You are an image detection assistant. You will receive a list of images with their URLs.
 Your task is to:
 1. ONLY select from the exact image URLs provided to you
 2. Return success: false and relevant_image: "" if no relevant images are found
-3. DO NOT generate or modify any URLs - use them exactly as provided
-4. Return one big description that talks about the images that you saw`,
-      messages: [
-        {
-          role: "user",
-          content: `Here is the content of the article: ${textContent}`,
-        },
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: `Analyze these ${imageContent.length} images in the context of: ${message}`,
-            },
-            ...imageContent,
-          ],
-        },
-      ],
-    });
-
-    console.log("Model response:", response.object); // Debug log
-
-    // Strict validation
-    if (
-      !imageContent.some((img) => img.image === response.object.relevant_image)
-    ) {
-      console.log("Invalid image URL returned, forcing false response");
-      return NextResponse.json({
-        success: false,
-        data: {
-          ...result,
-          relevant_image: "",
-        },
-        interpretedAction: action,
-        message,
+3. DO NOT generate or modify any URLs - use them exactly as provided`,
+        messages: [
+          {
+            role: "user",
+            content: `Here is the article content and context: "${message}"`,
+          },
+          {
+            role: "user",
+            content:
+              imageContent.length > 0
+                ? [
+                    {
+                      type: "text",
+                      text: `Analyze these ${imageContent.length} images and select the most relevant one:`,
+                    },
+                    ...imageContent,
+                  ]
+                : [
+                    {
+                      type: "text",
+                      text: "No valid images found.",
+                    },
+                  ],
+          },
+        ],
       });
+
+      console.log(response.object);
+
+      // Strict validation
+      if (
+        !imageContent.some(
+          (img) => img.image === response.object.relevant_image
+        )
+      ) {
+        console.log("Invalid image URL returned, forcing false response");
+        return NextResponse.json({
+          success: false,
+          interpretedAction: action,
+          message,
+        });
+      }
+    } catch (e) {
+      console.log(e);
     }
 
     return NextResponse.json({
       success: true,
-      data: result,
+      data: scrapeResult.data,
       interpretedAction: action,
       message,
     });
