@@ -143,14 +143,14 @@ export const Navbar = () => {
               asChild
               size="sm"
               className="ms-2"
-              aria-label="Get Template"
+              aria-label="Join"
             >
               <Link
-                aria-label="Get Template"
-                href="https://bundui.lemonsqueezy.com/buy/1bdac9fb-8246-494a-b28c-6c2ca6a28867"
+                aria-label="Join"
+                href="/auth"
                 target="_blank"
               >
-                Get Template
+                Join
               </Link>
             </Button>
           </div>

@@ -4,7 +4,6 @@ import { usePathname } from "next/navigation";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/layout/navbar";
-import { ThemeProvider } from "@/components/layout/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 const bricolageGrotesque = Bricolage_Grotesque({
@@ -21,7 +20,7 @@ export default function RootLayout({
   const showNavbar = pathname === "/";
 
   return (
-    <html lang="pt-br" suppressHydrationWarning>
+    <html lang="el" suppressHydrationWarning>
       <body
         className={cn(
           "min-h-screen bg-background",
@@ -29,16 +28,16 @@ export default function RootLayout({
           bricolageGrotesque.variable
         )}
       >
-        <ThemeProvider
+        {/* <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-        >
-          {showNavbar && <Navbar />}
+        >*/}
+        {showNavbar && <Navbar />}
 
-          {children}
-        </ThemeProvider>
+        {children}
+        {/* </ThemeProvider> */}
       </body>
     </html>
   );
