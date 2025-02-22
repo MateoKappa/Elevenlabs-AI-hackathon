@@ -52,7 +52,6 @@ export default function ChatContent() {
   }
 
   const chat = messages;
-  console.log(messages, "messages");
 
   return (
     <div className="flex flex-col z-50 inset-0 bg-background lg:bg-transparent fixed lg:relative p-4 lg:p-0">
