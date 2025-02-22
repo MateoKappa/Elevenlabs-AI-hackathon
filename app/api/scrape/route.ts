@@ -7,6 +7,7 @@ import { mistral } from "@ai-sdk/mistral";
 import * as htmlToText from "html-to-text";
 import { load } from "cheerio";
 import { ScrapeResponse } from "@mendable/firecrawl-js";
+import { openai } from "@ai-sdk/openai";
 
 // Initialize FireCrawl
 const firecrawl = new FireCrawl({
@@ -43,10 +44,6 @@ export async function POST(req: Request) {
           2. The specific action they want to perform`,
     });
 
-    const scrapeOptions = {
-      limit: 20,
-    };
-
     const result = (await firecrawl.scrapeUrl(url, {
       formats: ["html"],
     })) as ScrapeResponse;
@@ -66,15 +63,33 @@ export async function POST(req: Request) {
         alt: $(element).attr("alt") || "",
         width: $(element).attr("width"),
         height: $(element).attr("height"),
+        extension:
+          $(element).attr("src")?.split(".").pop()?.toLowerCase() || "",
       }))
       .get();
 
-    // Analyze all images together with Mistral Vision
+    const validImageFormats = ["png", "jpeg", "jpg", "gif", "webp"];
     const imageContent: { type: "image"; image: string }[] = images
-      .filter((img) => img.url)
+      .filter(
+        (
+          img
+        ): img is {
+          url: string;
+          alt: string;
+          width: string | undefined;
+          height: string | undefined;
+          extension: string;
+        } => {
+          console.log(img.extension, "extension22");
+          if (typeof img.url !== "string" || img.url.trim() === "")
+            return false;
+          const extension = img.url.split(".").pop()?.toLowerCase() || "";
+          return validImageFormats.some((format) => extension.includes(format));
+        }
+      )
       .map((img) => ({
-        type: "image_url",
-        imageUrl: img.url || "",
+        type: "image",
+        image: img.url,
       }));
 
     const textContent = htmlToText.convert(body, {
@@ -88,33 +103,53 @@ export async function POST(req: Request) {
     });
 
     const response = await generateObject({
-      model: mistral("pixtral-large-latest"),
+      model: openai("gpt-4o-mini"),
       schema: z.object({
+        success: z.boolean(),
         relevant_image: z.string(),
+        description: z.string(),
       }),
-      system:
-        "You are a image detection assistant. Given a list of images, analyze the images and its relevance to the user's article. Return the most relevant image if there is one, otherwise return an empty string",
+      system: `You are an image detection assistant. You will receive a list of images with their URLs.
+Your task is to:
+1. ONLY select from the exact image URLs provided to you
+2. Return success: false and relevant_image: "" if no relevant images are found
+3. DO NOT generate or modify any URLs - use them exactly as provided
+4. Return one big description that talks about the images that you saw`,
       messages: [
         {
           role: "user",
-          content: `Here is the contect of the article: ${textContent}`,
+          content: `Here is the content of the article: ${textContent}`,
         },
         {
           role: "user",
           content: [
             {
               type: "text",
-              text: "Analyze these images in the context of: " + message,
+              text: `Analyze these ${imageContent.length} images in the context of: ${message}`,
             },
-            {
-              type: "image_url",
-              imageUrl:
-                "https://tripfixers.com/wp-content/uploads/2019/11/eiffel-tower-with-snow.jpeg",
-            },
+            ...imageContent,
           ],
         },
       ],
     });
+
+    console.log("Model response:", response.object); // Debug log
+
+    // Strict validation
+    if (
+      !imageContent.some((img) => img.image === response.object.relevant_image)
+    ) {
+      console.log("Invalid image URL returned, forcing false response");
+      return NextResponse.json({
+        success: false,
+        data: {
+          ...result,
+          relevant_image: "",
+        },
+        interpretedAction: action,
+        message,
+      });
+    }
 
     return NextResponse.json({
       success: true,
