@@ -1,6 +1,6 @@
 "use client";
 
-import { icons, Menu } from "lucide-react";
+import { type icons, Menu } from "lucide-react";
 import React from "react";
 import {
   Sheet,
@@ -32,7 +32,7 @@ export const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
-    <header className="sticky top-2 lg:top-5 z-40">
+    <header className="sticky top-2 lg:top-5 z-40 mb-10">
       <div className="container">
         <div className="bg-opacity-15 border rounded-2xl flex justify-between items-center p-2 bg-background/70 backdrop-blur-sm">
           <Logo />

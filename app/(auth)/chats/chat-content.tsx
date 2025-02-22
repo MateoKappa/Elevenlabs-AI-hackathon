@@ -57,9 +57,11 @@ export default function ChatContent() {
   return (
     <div className="flex flex-col z-50 inset-0 bg-background lg:bg-transparent fixed lg:relative p-4 lg:p-0">
       <ChatHeader user={selectedChat.user} />
+
       <ScrollArea className="w-full h-screen lg:h-[calc(100vh_-_13.8rem)] py-4 relative">
         <div ref={messagesContainerRef}>
-          <div className="bg-gradient-to-b from-muted from-30% absolute start-0 end-0 top-0 h-[50px] pointer-events-none z-10"></div>
+          <div className="bg-gradient-to-b from-muted from-30% absolute start-0 end-0 top-0 h-[50px] pointer-events-none z-10" />
+
           <div className="flex flex-col items-start py-8 space-y-10 ">
             {chat &&
               chat.length > 0 &&
@@ -69,7 +71,9 @@ export default function ChatContent() {
           </div>
         </div>
       </ScrollArea>
+
       <ChatFooter messages={messages} setMessages={setMessages} />
+
       <UserDetailSheet user={selectedChat.user} />
     </div>
   );

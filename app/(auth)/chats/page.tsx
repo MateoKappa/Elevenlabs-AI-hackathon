@@ -33,7 +33,7 @@ export default async function Page() {
   );
 
   return (
-    <div className="lg:flex gap-8">
+    <div className="lg:flex gap-8 p-4">
       <div className="w-full lg:w-96">
         <Card>
           <CardHeader className="py-4 lg:py-6">
