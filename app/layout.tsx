@@ -1,12 +1,10 @@
-"use client";
-import { Inter, Bricolage_Grotesque } from "next/font/google";
-import { usePathname } from "next/navigation";
 import "./globals.css";
+
+import { Inter, Bricolage_Grotesque } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { Navbar } from "@/components/layout/navbar";
-import { ThemeProvider } from "@/components/layout/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
+
 const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ["latin"],
   variable: "--bricolage-grotesque",
@@ -17,11 +15,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  const showNavbar = pathname === "/";
-
   return (
-    <html lang="pt-br" suppressHydrationWarning>
+    <html lang="el" suppressHydrationWarning>
       <body
         className={cn(
           "min-h-screen bg-background",
@@ -29,16 +24,14 @@ export default function RootLayout({
           bricolageGrotesque.variable
         )}
       >
-        <ThemeProvider
+        {/* <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-        >
-          {showNavbar && <Navbar />}
-
-          {children}
-        </ThemeProvider>
+        >*/}
+        {children}
+        {/* </ThemeProvider> */}
       </body>
     </html>
   );

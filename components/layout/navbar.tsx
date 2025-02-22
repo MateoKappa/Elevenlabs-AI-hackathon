@@ -1,6 +1,6 @@
 "use client";
 
-import { icons, Menu } from "lucide-react";
+import { type icons, Menu } from "lucide-react";
 import React from "react";
 import {
   Sheet,
@@ -32,7 +32,7 @@ export const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
-    <header className="sticky top-2 lg:top-5 z-40">
+    <header className="sticky top-2 lg:top-5 z-40 mb-10">
       <div className="container">
         <div className="bg-opacity-15 border rounded-2xl flex justify-between items-center p-2 bg-background/70 backdrop-blur-sm">
           <Logo />
@@ -143,14 +143,14 @@ export const Navbar = () => {
               asChild
               size="sm"
               className="ms-2"
-              aria-label="Get Template"
+              aria-label="Join"
             >
               <Link
-                aria-label="Get Template"
-                href="https://bundui.lemonsqueezy.com/buy/1bdac9fb-8246-494a-b28c-6c2ca6a28867"
+                aria-label="Join"
+                href="/auth"
                 target="_blank"
               >
-                Get Template
+                Join
               </Link>
             </Button>
           </div>

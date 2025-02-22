@@ -12,35 +12,7 @@ import { ServicesSection } from "@/components/layout/sections/services";
 import { SponsorsSection } from "@/components/layout/sections/sponsors";
 import { TeamSection } from "@/components/layout/sections/team";
 import { TestimonialSection } from "@/components/layout/sections/testimonial";
-import { useEffect } from "react";
 import { fal } from "@fal-ai/client";
-
-// export const metadata = {
-//   title: `Cosmic - Shadcn Landing Page Template`,
-//   description:
-//     "Discover high-converting SaaS landing pages built with Next.js and Shadcn. Modern, responsive design and optimized features to elevate your brand's online presence.",
-//   openGraph: {
-//     type: "website",
-//     url: "https://shadcnuikit.com/template/cosmic-landing-page-template",
-//     title: "Cosmic - Landing Page Template (Shadcn)",
-//     description: "Shadcn landing page template for developers",
-//     images: [
-//       {
-//         url: "/seo.jpg",
-//         width: 1200,
-//         height: 630,
-//         alt: "Cosmic - Landing Page Template",
-//       },
-//     ],
-//   },
-//   twitter: {
-//     card: "summary_large_image",
-//     site: "https://shadcnuikit.com/template/cosmic-landing-page-template",
-//     title: "Cosmic - Landing Page Template (Shadcn)",
-//     description: "Shadcn landing page template for developers",
-//     images: ["/seo.jpg"],
-//   },
-// };
 
 fal.config({
   proxyUrl: "/api/fal",
