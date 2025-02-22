@@ -50,12 +50,13 @@ export async function POST(req: Request) {
 
     // Scrape the content from the url
     const scrapeResult = await firecrawl.extract([url], {
-      prompt: "Extract the content of the news article from the page along with the title and the urls from the images.",
-      schema: schema
+      prompt:
+        "Extract the content of the news article from the page along with the title and the urls from the images.",
+      schema: schema,
     });
-    
+
     if (!scrapeResult.success) {
-      throw new Error(`Failed to scrape: ${scrapeResult.error}`)
+      throw new Error(`Failed to scrape: ${scrapeResult.error}`);
     }
     const content = scrapeResult.data.content;
     console.log({ content });
