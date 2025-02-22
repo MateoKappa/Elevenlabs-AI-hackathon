@@ -35,133 +35,117 @@ import { useWavesurfer } from "@wavesurfer/react";
 export default function ChatFooter({
   messages,
   setMessages,
+  setCurrentAudioPosition,
 }: {
   messages: ChatMessageProps[];
   setMessages: (messages: ChatMessageProps[]) => void;
+  setCurrentAudioPosition: (position: number) => void;
 }) {
   const [inputValue, setInputValue] = useState("");
   const [audioUrl, setAudioUrl] = useState("");
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  const { wavesurfer, isPlaying } = useWavesurfer({
-    container: containerRef,
-    height: 44,
-    barGap: 2,
-    barRadius: 4,
-    barWidth: 3,
-    barHeight: 1,
-    waveColor: "#d1a0b5",
-    progressColor: "#a3426c",
-    cursorWidth: 0,
-    interact: true,
-    fillParent: true,
-    hideScrollbar: true,
-    url: audioUrl,
-  });
+  const [videoUrl, setVideoUrl] = useState<string>("");
 
   const onSubmit = async () => {
-    setMessages([
+    const newMessageId =
+      messages.length > 0 ? messages[messages.length - 1].id + 1 : 1;
+    const updatedMessages = [
       ...messages,
       {
-        id: messages.length > 0 ? messages[messages.length - 1].id + 1 : 1,
+        id: newMessageId,
         content: inputValue,
         type: "text",
         own_message: true,
-      },
-    ]);
+      } as ChatMessageProps,
+      {
+        id: newMessageId + 1,
+        content: "",
+        type: "text",
+        own_message: false,
+        state: "creating_text" as const,
+      } as ChatMessageProps,
+    ];
+
+    setMessages(updatedMessages);
+
     setInputValue("");
-    // const response = await fetch("/api/scrape", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({ userMessage: inputValue }),
-    // });
-
-    // const data = await response.json();
-
-    const result = await fal.subscribe("fal-ai/flux-pro/v1.1-ultra", {
-      input: {
-        prompt:
-          'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.',
-      },
-      logs: true,
-      onQueueUpdate: (update) => {
-        if (update.status === "IN_PROGRESS") {
-          update.logs.map((log) => log.message).forEach(console.log);
-        }
-      },
-    });
-    console.log(result.data, "result");
-
-    // const result = await fal.subscribe("fal-ai/minimax-video/image-to-video", {
-    //   input: {
-    //     prompt:
-    //       "A woman is making a cocktail and a bear comes up and drinks the cocktail",
-    //     image_url:
-    //       "https://scontent.fath4-2.fna.fbcdn.net/v/t39.30808-6/357398398_6566702153375369_3512165724848225869_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=a5f93a&_nc_ohc=GHa9SDB4yigQ7kNvgFlAXGB&_nc_oc=Adg39KRkcslqXGDonM1RPJfZoDxdnE3JD6xyLcgWayLmMEZPANo7SBAc_yUELkt1h-UoKY4EjCk5hUS3Dwp4-pXJ&_nc_zt=23&_nc_ht=scontent.fath4-2.fna&_nc_gid=AxSiNn47rd3L4vM6bgxbqkq&oh=00_AYAbESFo_pi8rxMNfqJDvuplPH-dIBpDuxXQX7kBQ6c9Jw&oe=67BF6A08",
-    //   },
-    //   logs: true,
-    //   onQueueUpdate: (update) => {
-    //     console.log(update);
-    //   },
-    // });
-    // console.log(data, "data");
-    const response = await fetch("/api/scrape", {
+    const scrapeResponse = await fetch("/api/scrape", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ userMessage: inputValue }),
     });
-    if (response.ok) {
-      const res = await response.blob();
-      setAudioUrl(URL.createObjectURL(res));
+
+    if (!scrapeResponse.ok) {
+      return;
     }
+
+    const { text, video_prompt } = await scrapeResponse.json();
+
+    setMessages([
+      ...updatedMessages.slice(0, -1),
+      {
+        ...updatedMessages[updatedMessages.length - 1],
+        state: "creating_audio",
+      },
+    ]);
+
+    const [audioBuffer, videoResult] = await Promise.all([
+      // Text to speech request
+      fetch("/api/text-to-speech", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content: text }),
+      })
+        .then((res) => res.arrayBuffer())
+        .then((buffer) => {
+          const audioUrl = URL.createObjectURL(new Blob([buffer]));
+          setAudioUrl(audioUrl);
+
+          setMessages([
+            ...updatedMessages.slice(0, -1),
+            {
+              ...updatedMessages[updatedMessages.length - 1],
+              content: text,
+              audio: audioUrl,
+              state: "creating_video",
+            },
+          ]);
+
+          return buffer;
+        }),
+
+      (async () => {
+        return fal.subscribe("fal-ai/minimax/video-01-live", {
+          input: {
+            prompt: text.slice(0, 150),
+            prompt_optimizer: true,
+          },
+          logs: true,
+          onQueueUpdate: (update) => {
+            console.log(update);
+          },
+        });
+      })(),
+    ]);
+
+    setVideoUrl(videoResult.data.video.url);
+    setMessages([
+      ...updatedMessages.slice(0, -1),
+      {
+        ...updatedMessages[updatedMessages.length - 1],
+        content: text,
+        audio: audioUrl,
+        video: videoResult.data.video.url,
+        state: "idle",
+      } as ChatMessageProps,
+    ]);
   };
-
-  const playPause = useCallback(() => {
-    if (!wavesurfer) return;
-
-    console.log("isPlaying", isPlaying);
-    if (isPlaying) wavesurfer.pause();
-    else wavesurfer.play();
-  }, [isPlaying, wavesurfer]);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    if (!wavesurfer) return;
-
-    wavesurfer.on("interaction", () => {
-      wavesurfer.play();
-    });
-    wavesurfer.on("finish", () => {
-      wavesurfer.stop();
-    });
-
-    return () => {
-      wavesurfer.destroy();
-    };
-  }, [wavesurfer]);
 
   return (
     <>
-      <div className="flex flex-col">
-        {audioUrl && (
-          <div className="mt-3 flex flex-row items-center gap-1 rounded-full border border-bright-plum-50 bg-bright-plum-7 px-3 py-1 text-sm">
-            <button
-              className="shrink-0 text-bright-plum"
-              type="button"
-              onClick={playPause}
-            >
-              {isPlaying ? <PauseCircle size={32} /> : <PlayCircle size={32} />}
-            </button>
-
-            <div className="ml-1 h-full w-full" ref={containerRef} />
-          </div>
-        )}
-      </div>
-
       <Card>
         <CardContent className="p-2 lg:p-4 flex items-center relative">
           <Input

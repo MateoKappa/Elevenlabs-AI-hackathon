@@ -21,6 +21,9 @@ export type ChatMessageProps = {
   own_message?: boolean;
   read?: boolean;
   data?: ChatMessageDataProps;
+  audio?: string;
+  video?: string;
+  state?: "creating_text" | "creating_audio" | "creating_video" | "idle";
 };
 
 export type ChatMessageDataProps = {

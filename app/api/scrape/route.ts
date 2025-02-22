@@ -5,8 +5,6 @@ import { generateObject, generateText } from "ai";
 import { mistral } from "@ai-sdk/mistral";
 import { ElevenLabsClient } from "elevenlabs";
 
-const client = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
-
 const firecrawl = new FireCrawl({
   apiKey: process.env.FIRECRAWL_API_KEY,
 });
@@ -82,58 +80,55 @@ export async function POST(req: Request) {
     }
     const content = scrapeResult.data.content;
 
-    const response = await client.textToSpeech.convert("CYw3kZ02Hs0563khs1Fj", {
-      output_format: "mp3_44100_128",
-      text: content,
-      model_id: "eleven_multilingual_v2",
-    });
+    const [textResult, videoPrompt] = await Promise.all([
+      generateObject({
+        model: mistral("mistral-large-latest"),
+        schema: z.object({
+          text: z.string(),
+        }),
+        prompt: `
+        Transform the following content into an engaging, conversational narrative that's optimized for audio listening. 
+        Make it feel like a natural story or explanation, avoiding technical jargon when possible. 
+        Add appropriate transitions and maintain a flowing narrative structure.
+        Keep the key information but present it in a way that's easy to follow when listening.
+        
+        Remember to:
+        - Start with a hook or interesting introduction
+        - Use natural transitions between topics
+        - Maintain a conversational tone
+        - Conclude with a clear wrap-up
 
-    const chunks = [];
-    for await (const chunk of response) {
-      if (chunk) {
-        chunks.push(chunk);
-      }
-    }
-    const audioBuffer = Buffer.concat(chunks);
+        ### Content
+        ${content}
+        `,
+      }),
+      generateObject({
+        model: mistral("mistral-large-latest"),
+        schema: z.object({
+          videoPrompt: z.string(),
+        }),
+        prompt: `
+        You are a video scene description expert. Create a concise, visual description of the key concepts from this content that would work well for AI video generation.
 
-    console.log({ audioBuffer });
+        Focus on:
+        - Visual elements and scenes that represent the main ideas
+        - Professional setting and atmosphere
+        - Key objects, actions, or demonstrations needed
+        - Appropriate emotional tone
+        - Clear, filmable descriptions
 
-    // const { text } = await generateText({
-    //   model: mistral("mistral-large-latest"),
-    //   prompt: `
-    //   Convert the content of the news article into a nice conversation between two people in a podcast.
-    //   The conversation should be in the style of a podcast.
-    //   The conversation should be between two people, one of them is the host and the other is the guest.
-    //   The host should be the one who is asking the questions and the guest should be the one who is answering the questions.
-    //   The host should be the one who is introducing the guest and the guest should be the one who is answering the questions.
-    //   The host should be the one who is asking the questions and the guest should be the one who is answering the questions.
+        Keep the description under 50 words and make it specific enough for video generation.
+        Avoid abstract concepts - translate them into concrete, visual scenes.
 
-    //   ### Content
-    //   ${content}
-    //   `,
-    // });
+        ### Content
+        ${content}
+        `,
+      }),
+    ]);
 
-    // console.log({text});
-    // const response = await client.studio.createPodcast({
-    //     model_id: "eleven_multilingual_v2",
-    //     mode: {
-    //         type: "conversation",
-    //         conversation: {
-    //             host_voice_id: "CYw3kZ02Hs0563khs1Fj",
-    //             guest_voice_id: "AZnzlk1XvdvUeBnXmlld"
-    //         }
-    //     },
-    //     source: [{
-    //       type: "text",
-    //       text: text
-    //     }]
-    // });
-    // console.log({response});
-
-    // console.log(scrapeResult.data);
-
-    return new NextResponse(audioBuffer, {
-      headers: { "Content-Type": "audio/mpeg" },
+    return NextResponse.json({
+      text: textResult.object.text,
+      video_prompt: videoPrompt.object.videoPrompt,
     });
   } catch (error) {
     console.error("Scraping error:", error);

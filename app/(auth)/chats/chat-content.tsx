@@ -27,6 +27,9 @@ export default function ChatContent() {
     selectedChat?.messages ?? test
   );
 
+  // Add new state for tracking current audio position
+  const [currentAudioPosition, setCurrentAudioPosition] = useState<number>(0);
+
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollIntoView(false);
@@ -59,19 +62,26 @@ export default function ChatContent() {
 
       <ScrollArea className="w-full h-screen lg:h-[calc(100vh_-_13.8rem)] py-4 relative">
         <div ref={messagesContainerRef}>
-          <div className="bg-gradient-to-b from-muted from-30% absolute start-0 end-0 top-0 h-[50px] pointer-events-none z-10" />
-
           <div className="flex flex-col items-start py-8 space-y-10 ">
             {chat &&
               chat.length > 0 &&
               chat.map((item: ChatMessageProps) => (
-                <ChatBubble message={item} type={item.type} key={item.id} />
+                <ChatBubble
+                  message={item}
+                  type={item.type ?? "text"}
+                  key={item.id}
+                  currentAudioPosition={currentAudioPosition}
+                />
               ))}
           </div>
         </div>
       </ScrollArea>
 
-      <ChatFooter messages={messages} setMessages={setMessages} />
+      <ChatFooter
+        messages={messages}
+        setMessages={setMessages}
+        setCurrentAudioPosition={setCurrentAudioPosition}
+      />
 
       <UserDetailSheet user={selectedChat.user} />
     </div>
