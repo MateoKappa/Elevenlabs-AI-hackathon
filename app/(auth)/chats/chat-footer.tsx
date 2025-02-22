@@ -16,8 +16,40 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ChatMessageProps } from "@/types";
+import { useState } from "react";
 
-export default function ChatFooter() {
+export default function ChatFooter({
+  messages,
+  setMessages,
+}: {
+  messages: ChatMessageProps[];
+  setMessages: (messages: ChatMessageProps[]) => void;
+}) {
+  const [inputValue, setInputValue] = useState("");
+  const onSubmit = async () => {
+    setMessages([
+      ...messages,
+      {
+        id: messages.length > 0 ? messages[messages.length - 1].id + 1 : 1,
+        content: inputValue,
+        type: "text",
+        own_message: true,
+      },
+    ]);
+    setInputValue("");
+    const response = await fetch("/api/scrape", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userMessage: inputValue }),
+    });
+
+    const data = await response.json();
+    console.log(data, "data");
+  };
+
   return (
     <>
       <Card>
@@ -26,6 +58,8 @@ export default function ChatFooter() {
             type="text"
             className="border-transparent !text-base !ring-transparent !shadow-transparent pe-32 lg:pe-56"
             placeholder="Enter message..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
           />
           <div className="absolute flex items-center end-4">
             <div className="block lg:hidden">
@@ -83,7 +117,7 @@ export default function ChatFooter() {
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <Button variant="outline" className="ms-3">
+            <Button onClick={onSubmit} variant="outline" className="ms-3">
               Send
             </Button>
           </div>

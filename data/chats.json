@@ -5,7 +5,15 @@
     "last_message": "",
     "status": "sent",
     "is_archive": false,
-    "messages": [],
+    "messages": [
+      {
+        "id": 1,
+        "content": "👋 Welcome! Send me any article link, and I'll transform it into an engaging podcast with:\n\n• AI-narrated audio\n• Storytelling-style rewrite\n• Generated visuals\n\nJust paste your article link to get started!",
+        "type": "text",
+        "read": true,
+        "own_message": false
+      }
+    ],
     "user_id": 1,
     "medias": [
       {
@@ -104,7 +112,7 @@
   {
     "id": 5,
     "date": "2 days",
-    "last_message": "No worries at all! I’ll grab a table and wait for you. Drive safe!",
+    "last_message": "No worries at all! I'll grab a table and wait for you. Drive safe!",
     "status": "forwarded",
     "messages": [
       {
@@ -168,7 +176,7 @@
   {
     "id": 9,
     "date": "1 day",
-    "last_message": "Absolutely! It’s amazing to see her so happy and passionate about it.",
+    "last_message": "Absolutely! It's amazing to see her so happy and passionate about it.",
     "status": "read",
     "messages": [
       {
