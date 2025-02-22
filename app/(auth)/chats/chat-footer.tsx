@@ -18,6 +18,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChatMessageProps } from "@/types";
 import { useState } from "react";
+import { fal } from "@fal-ai/client";
+
+fal.config({
+  proxyUrl: "/api/fal",
+});
 
 export default function ChatFooter({
   messages,
@@ -38,16 +43,43 @@ export default function ChatFooter({
       },
     ]);
     setInputValue("");
-    const response = await fetch("/api/scrape", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userMessage: inputValue }),
-    });
+    // const response = await fetch("/api/scrape", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({ userMessage: inputValue }),
+    // });
 
-    const data = await response.json();
-    console.log(data, "data");
+    // const data = await response.json();
+
+    const result = await fal.subscribe("fal-ai/flux-pro/v1.1-ultra", {
+      input: {
+        prompt:
+          'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.',
+      },
+      logs: true,
+      onQueueUpdate: (update) => {
+        if (update.status === "IN_PROGRESS") {
+          update.logs.map((log) => log.message).forEach(console.log);
+        }
+      },
+    });
+    console.log(result.data, "result");
+
+    // const result = await fal.subscribe("fal-ai/minimax-video/image-to-video", {
+    //   input: {
+    //     prompt:
+    //       "A woman is making a cocktail and a bear comes up and drinks the cocktail",
+    //     image_url:
+    //       "https://scontent.fath4-2.fna.fbcdn.net/v/t39.30808-6/357398398_6566702153375369_3512165724848225869_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=a5f93a&_nc_ohc=GHa9SDB4yigQ7kNvgFlAXGB&_nc_oc=Adg39KRkcslqXGDonM1RPJfZoDxdnE3JD6xyLcgWayLmMEZPANo7SBAc_yUELkt1h-UoKY4EjCk5hUS3Dwp4-pXJ&_nc_zt=23&_nc_ht=scontent.fath4-2.fna&_nc_gid=AxSiNn47rd3L4vM6bgxbqkq&oh=00_AYAbESFo_pi8rxMNfqJDvuplPH-dIBpDuxXQX7kBQ6c9Jw&oe=67BF6A08",
+    //   },
+    //   logs: true,
+    //   onQueueUpdate: (update) => {
+    //     console.log(update);
+    //   },
+    // });
+    // console.log(data, "data");
   };
 
   return (

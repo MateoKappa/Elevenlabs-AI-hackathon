@@ -2,12 +2,17 @@ import "./globals.css";
 
 import { Inter, Bricolage_Grotesque } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { fal } from "@fal-ai/client";
 
 const inter = Inter({ subsets: ["latin"] });
 
 const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ["latin"],
   variable: "--bricolage-grotesque",
+});
+
+fal.config({
+  proxyUrl: "/api/fal",
 });
 
 export default function RootLayout({

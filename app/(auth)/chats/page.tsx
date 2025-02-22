@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ChatList from "@/app/(auth)/chats/chat-list";
 import ActionDropdown from "./action-dropdown";
 import ChatContent from "@/app/(auth)/chats/chat-content";
+import { fal } from "@fal-ai/client";
 
 async function getChats() {
   const data = await fs.readFile(path.join(process.cwd(), "data/chats.json"));

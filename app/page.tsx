@@ -14,10 +14,6 @@ import { TeamSection } from "@/components/layout/sections/team";
 import { TestimonialSection } from "@/components/layout/sections/testimonial";
 import { fal } from "@fal-ai/client";
 
-fal.config({
-  proxyUrl: "/api/fal",
-});
-
 export default function Home() {
   // useEffect(() => {
   //   (async () => {
