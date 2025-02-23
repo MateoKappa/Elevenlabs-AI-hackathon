@@ -71,8 +71,9 @@ export default function UserDetailSheet({ user }: { user: UserPropsTypes }) {
                     <div>
                       <ScrollArea className="w-full">
                         <div className="flex gap-4 *:flex-shrink-0">
-                          {user.medias.map((item) => (
-                            <>
+                          {user.medias.map((item, index) => (
+                            // biome-ignore lint/suspicious/noArrayIndexKey: -
+                            <React.Fragment key={index}>
                               {item.type === "image" && (
                                 <div>
                                   <img
@@ -112,7 +113,7 @@ export default function UserDetailSheet({ user }: { user: UserPropsTypes }) {
                                   </a>
                                 </div>
                               )}
-                            </>
+                            </React.Fragment>
                           ))}
                         </div>
                         <ScrollBar orientation="horizontal" />
@@ -127,6 +128,7 @@ export default function UserDetailSheet({ user }: { user: UserPropsTypes }) {
                       <a
                         href={user.website}
                         target="_blank"
+                        rel="noreferrer"
                         className="hover:underline"
                       >
                         {user.website}
@@ -142,6 +144,7 @@ export default function UserDetailSheet({ user }: { user: UserPropsTypes }) {
                     <div className="flex flex-wrap items-center gap-2 *:flex-shrink-0">
                       {user.social_links.map((item, key) => (
                         <Button
+                          // biome-ignore lint/suspicious/noArrayIndexKey: -
                           key={key}
                           asChild
                           variant="secondary"

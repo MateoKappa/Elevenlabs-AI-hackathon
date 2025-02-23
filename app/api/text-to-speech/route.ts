@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { ElevenLabsClient } from "elevenlabs";
+import { createClient } from "@/supabase/server";
+import ShortUniqueId from "short-unique-id";
+import { upsertChat } from "@/server-actions/chats";
 
 const client = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
 
@@ -7,7 +10,7 @@ export const runtime = "edge";
 
 export async function POST(req: Request) {
   try {
-    const { content } = await req.json();
+    const { content, roomUuid, chatId } = await req.json();
 
     const response = await client.textToSpeech.convert("CYw3kZ02Hs0563khs1Fj", {
       output_format: "mp3_44100_128",
@@ -22,6 +25,16 @@ export async function POST(req: Request) {
       }
     }
     const audioBuffer = Buffer.concat(chunks);
+
+    const { randomUUID } = new ShortUniqueId({ length: 10 });
+
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .storage
+      .from("audio")
+      .upload(`${randomUUID()}.mp3`, audioBuffer);
+
+    await upsertChat(roomUuid, content, data?.fullPath ?? null, null, chatId);
 
     return new NextResponse(audioBuffer, {
       headers: { "Content-Type": "audio/mpeg" },

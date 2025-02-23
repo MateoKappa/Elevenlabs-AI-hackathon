@@ -4,20 +4,16 @@ export async function getChats() {
   try {
     const supabase = await createClient();
 
-    // const { data: user } = await supabase //
-    // 	.auth
-    // 	.getUser()
+    const { data: user } = await supabase //
+    	.auth
+    	.getUser()
 
-    // console.log({user})
-
-    // if (!user || !user.user) throw new Error("User not found");
-
-    const userUuid = "be1ca6b8-e04b-4188-bd44-66d38e7d454f";
+    if (!user || !user.user) throw new Error("User not found");
 
     const { data: rooms } = await supabase //
       .from("rooms")
       .select("*")
-      .eq("user_uuid", userUuid)
+      .eq("user_uuid", user.user.id)
       .throwOnError();
 
     if (!rooms || rooms.length === 0) {
@@ -37,13 +33,37 @@ export async function getChats() {
     return rooms.map((room) => ({
       ...room,
       user: {
-        id: userUuid,
-        name: "John Doe",
-        avatar: "https://via.placeholder.com/150",
+        id: user.user.id,
+        name: user.user.user_metadata.name,
+        avatar: user.user.user_metadata.avatar_url,
       },
       messages: messages?.filter((message) => message.room_uuid === room.id),
       last_message: messages?.find((message) => message.room_uuid === room.id),
     }));
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function upsertChat(room_uuid: string, content: string, audio: string | null, video: string | null, chat_id?: string) {
+  try {
+    const supabase = await createClient();
+
+    const { data } = await supabase
+      .from("chat_history")
+      .upsert({
+        id: chat_id,
+        room_uuid,
+        content,
+        audio,
+        video,
+        type: "TEXT",
+      })
+      .select()
+      .throwOnError();
+
+    return data[0];
   } catch (error) {
     console.error(error);
     throw error;

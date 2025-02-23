@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { generateObject, generateText } from "ai";
 import { mistral } from "@ai-sdk/mistral";
+import { upsertChat } from "@/server-actions/chats";
 
 const firecrawl = new FireCrawl({
   apiKey: process.env.FIRECRAWL_API_KEY,
@@ -18,9 +19,7 @@ export const runtime = "edge";
 
 export async function POST(req: Request) {
   try {
-    const { userMessage } = await req.json();
-
-    console.log("generating response", userMessage);
+    const { userMessage, roomUuid } = await req.json();
 
     const {
       object: {
@@ -59,8 +58,6 @@ export async function POST(req: Request) {
         Instructions: "Focus on extracting content specifically about ElevenLabs. Look for sections, headings, or content blocks that mention ElevenLabs, their products, features, or services. Ignore content about other companies or tools."`,
     });
 
-    console.log("scraping");
-
     if (!success) {
       return NextResponse.json({
         success: false,
@@ -82,8 +79,6 @@ export async function POST(req: Request) {
       throw new Error(`Failed to scrape: ${scrapeResult.error}`);
     }
     const content = scrapeResult.data.content;
-
-    console.log("generating text");
 
     const [textResult, videoPrompt] = await Promise.all([
       generateObject({
@@ -131,14 +126,12 @@ export async function POST(req: Request) {
       }),
     ]);
 
-    console.log({
-      text: textResult.object.text,
-      video_prompt: videoPrompt.object.videoPrompt,
-    });
+    const chat = await upsertChat(roomUuid, textResult.object.text, null, null);
 
     return NextResponse.json({
       text: textResult.object.text,
       video_prompt: videoPrompt.object.videoPrompt,
+      chat_id: chat.id,
     });
   } catch (error) {
     console.error("Scraping error:", error);

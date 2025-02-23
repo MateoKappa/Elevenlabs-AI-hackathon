@@ -2,8 +2,6 @@
 
 import { useContext, useEffect, useRef, useState } from "react";
 import type {
-  ChatMessageProps,
-  ChatRoomProps,
   SelectedChatContextType,
 } from "@/types";
 
@@ -11,8 +9,7 @@ import Input from "./input";
 import ChatBubble from "./chat-bubbles";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SelectedChatContext } from "@/components/contexts";
-import UserDetailSheet from "./user-detail-sheet";
-import { Tables } from "@/db/database.types";
+import type { Tables } from "@/db/database.types";
 
 export default function ChatContent() {
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
@@ -50,11 +47,9 @@ export default function ChatContent() {
 
   const chat = messages;
 
-  console.log(!!chat, chat, chat.length, chat.length > 0);
-
   return (
-    <div className="flex flex-col z-50 inset-0 bg-background lg:bg-transparent fixed lg:relative p-4 lg:p-0">
-      <ScrollArea className="w-full h-screen lg:h-[calc(100vh_-_13.8rem)] py-4 relative">
+    <div className="h-full flex justify-between flex-col z-50 inset-0 bg-background lg:bg-transparent fixed lg:relative p-4 lg:p-0">
+      <ScrollArea className="w-full h-screen py-4 relative">
         <div ref={messagesContainerRef}>
           <div className="flex flex-col items-start py-8 space-y-10 ">
             {chat &&
@@ -72,7 +67,7 @@ export default function ChatContent() {
 
       <Input messages={messages} setMessages={setMessages} />
 
-      <UserDetailSheet user={selectedChat.user} />
+      {/* <UserDetailSheet user={selectedChat.user} /> */}
     </div>
   );
 }
