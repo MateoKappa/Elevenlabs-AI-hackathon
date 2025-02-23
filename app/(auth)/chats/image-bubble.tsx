@@ -2,7 +2,6 @@ import { Card } from "@/components/ui/card";
 import { CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { Tables } from "@/db/database.types";
-import MessageStatusIcon from "./message-status-icon";
 import moment from "moment";
 
 export default function ImageChatBubble({

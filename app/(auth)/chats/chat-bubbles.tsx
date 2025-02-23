@@ -1,16 +1,14 @@
 import { cn } from "@/lib/utils";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { PauseCircle, PlayCircle } from "lucide-react";
-import MessageStatusIcon from "./message-status-icon";
-import { useWavesurfer } from "@wavesurfer/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useCallback } from "react";
 import type { Tables } from "@/db/database.types";
 import AudioBubble from "./audio-bubble";
 import StreamingText from "./streaming-text";
 import moment from "moment";
 import ImageChatBubble from "./image-bubble";
+
 function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
   const [localAudioPosition, setLocalAudioPosition] = useState(0);
   const [isFinished, setIsFinished] = useState(false);

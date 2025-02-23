@@ -1,15 +1,8 @@
 "use client";
 
-import { ArrowLeft, Ellipsis, Phone, PhoneCall, Video, X } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-// import ChatUserDropdown from "./chat-list-item-dropdown";
-import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-// import type { UserPropsTypes } from "./types";
 import UserAvatar from "@/components/user-avatar";
-// import { generateAvatarFallback } from "@/lib/utils";
-// import useChatStore from "@/store/chatStore";
-import { Tables } from "@/db/database.types";
 import { useContext } from "react";
 import { SelectedChatContext } from "@/components/contexts";
 import { generateAvatarFallback } from "@/lib/generate-avatar-fallback";
