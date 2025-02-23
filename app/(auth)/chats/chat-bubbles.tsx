@@ -25,17 +25,10 @@ import { useCallback } from "react";
 interface ChatBubbleProps {
   message: ChatMessageProps;
   type: string;
-  currentAudioPosition: number;
   audio?: string;
 }
 
-function TextChatBubble({
-  message,
-  currentAudioPosition,
-}: {
-  message: ChatMessageProps;
-  currentAudioPosition: number;
-}) {
+function TextChatBubble({ message }: { message: ChatMessageProps }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [localAudioPosition, setLocalAudioPosition] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
@@ -86,10 +79,6 @@ function TextChatBubble({
     wavesurfer.on("ready", () => {
       wavesurfer.play();
     });
-
-    return () => {
-      wavesurfer.destroy();
-    };
   }, [wavesurfer]);
 
   const CHARS_PER_SECOND = 14.5;
@@ -119,6 +108,31 @@ function TextChatBubble({
     >
       <div className="flex gap-2 items-center">
         <div className="flex flex-col gap-2">
+          {isCreatingVideo && (
+            <Card className="w-fit">
+              <CardContent className="p-4 ">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 bg-red-500 rounded animate-pulse w-4" />
+                    <span className="text-sm text-muted-foreground">
+                      Creating video...
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          {videoCreated && (
+            <Card className="w-full">
+              <CardContent className="p-4 ">
+                <video
+                  className="rounded-lg w-full max-w-[550px]"
+                  controls
+                  src={message.video}
+                />
+              </CardContent>
+            </Card>
+          )}
           <Card className={cn({ "order-1": message.own_message })}>
             <CardContent className="p-4 flex flex-col">
               {isLoading ? (
@@ -163,31 +177,6 @@ function TextChatBubble({
               )}
             </CardContent>
           </Card>
-          {isCreatingVideo && (
-            <Card className="w-fit">
-              <CardContent className="p-4 w-fit">
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="h-4 bg-red-500 rounded animate-pulse w-4" />
-                    <span className="text-sm text-muted-foreground">
-                      Creating video...
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-          {videoCreated && (
-            <Card className="w-fit">
-              <CardContent className="p-4 w-fit">
-                <video
-                  className="rounded-lg max-w-[550px]"
-                  controls
-                  src={message.video}
-                />
-              </CardContent>
-            </Card>
-          )}
         </div>
         <div className={cn({ "order-2": !message.own_message })}>
           <DropdownMenu>
@@ -502,20 +491,10 @@ function ImageChatBubble({ message }: { message: ChatMessageProps }) {
   );
 }
 
-export default function ChatBubble({
-  message,
-  type,
-  currentAudioPosition,
-  audio,
-}: ChatBubbleProps) {
+export default function ChatBubble({ message, type, audio }: ChatBubbleProps) {
   switch (type) {
     case "text":
-      return (
-        <TextChatBubble
-          message={message}
-          currentAudioPosition={currentAudioPosition}
-        />
-      );
+      return <TextChatBubble message={message} />;
     case "video":
       return <VideoChatBubble message={message} />;
     case "sound":

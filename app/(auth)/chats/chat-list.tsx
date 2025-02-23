@@ -8,10 +8,11 @@ import ChatListItem from "./chat-list-item";
 import { SelectedChatContext } from "@/components/contexts";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEffect } from "react";
 
 export default function ChatList({ chats }: { chats: ChatItemProps[] }) {
   const context = useContext(SelectedChatContext);
-  const { selectedChat } = context || { selectedChat: null };
+  const { selectedChat, setSelectedChat } = context || { selectedChat: null };
   const [filteredChats, setFilteredChats] = useState(chats);
 
   const changeHandle = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,7 +24,11 @@ export default function ChatList({ chats }: { chats: ChatItemProps[] }) {
     setFilteredChats(filteredItems);
   };
 
-  console.log(filteredChats, "filteredChats");
+  useEffect(() => {
+    if (chats.length > 0 && setSelectedChat) {
+      setSelectedChat(chats[0]);
+    }
+  }, [chats, setSelectedChat]);
 
   return (
     <>

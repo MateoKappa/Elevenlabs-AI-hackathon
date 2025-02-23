@@ -3,7 +3,8 @@ import "./globals.css";
 import { Inter, Bricolage_Grotesque } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { fal } from "@fal-ai/client";
-
+import { ThemeProvider } from "@/components/theme-provider";
+import { Navbar } from "@/components/layout/navbar";
 const inter = Inter({ subsets: ["latin"] });
 
 const bricolageGrotesque = Bricolage_Grotesque({
@@ -29,14 +30,14 @@ export default function RootLayout({
           bricolageGrotesque.variable
         )}
       >
-        {/* <ThemeProvider
+        <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-        >*/}
-        {children}
-        {/* </ThemeProvider> */}
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

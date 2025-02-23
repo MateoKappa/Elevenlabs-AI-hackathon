@@ -13,20 +13,14 @@ export const benefitList: BenefitsProps[] = [
   },
   {
     icon: "ChartLine",
-    title: "Real Time Data Analytics",
+    title: "Real Time Video Generation",
     description:
-      "We help you make more informed and strategic decisions by instantly analyzing your data.",
+      "We create you a short video for your article or podcast to help you get more views and subscribers.",
   },
   {
     icon: "Wallet",
     title: "Personalized Experience",
     description:
-      "It offers flexible solutions with its adaptable structure according to the specific needs of your business.",
-  },
-  {
-    icon: "Sparkle",
-    title: "Scalable Structure",
-    description:
-      "Move forward into the future with confidence, with an infrastructure that can expand as your business grows.",
+      "It offers flexible adaptability with its structure according to the specific needs of your content.",
   },
 ];

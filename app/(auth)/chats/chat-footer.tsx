@@ -114,7 +114,7 @@ export default function ChatFooter({
             },
           ]);
 
-          return buffer;
+          return audioUrl;
         }),
 
       (async () => {

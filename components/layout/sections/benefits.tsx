@@ -15,10 +15,8 @@ export const BenefitsSection = () => {
             className="sticky lg:top-[22rem] text-center lg:text-start max-w-full"
             subTitle="Benefits"
             title="What Do We Bring to You?"
-            description="All the innovative solutions you need to grow your business are
-              here! We add value to your business with our features that
-              simplify your workflow, increase efficiency and strengthen your
-              decisions."
+            description="All the innovative solutions you need to grow your create your own entertaining podcast videos
+              here! We help you create your own content with our AI-powered tools."
           />
         </div>
 

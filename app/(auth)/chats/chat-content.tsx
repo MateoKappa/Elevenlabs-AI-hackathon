@@ -56,6 +56,8 @@ export default function ChatContent() {
 
   const chat = messages;
 
+  console.log(messages);
+
   return (
     <div className="flex flex-col z-50 inset-0 bg-background lg:bg-transparent fixed lg:relative p-4 lg:p-0">
       <ChatHeader user={selectedChat.user} />
@@ -70,7 +72,6 @@ export default function ChatContent() {
                   message={item}
                   type={item.type ?? "text"}
                   key={item.id}
-                  currentAudioPosition={currentAudioPosition}
                 />
               ))}
           </div>

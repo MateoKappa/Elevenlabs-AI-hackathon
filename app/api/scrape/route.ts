@@ -126,6 +126,11 @@ export async function POST(req: Request) {
       }),
     ]);
 
+    console.log({
+      text: textResult.object.text,
+      video_prompt: videoPrompt.object.videoPrompt,
+    });
+
     return NextResponse.json({
       text: textResult.object.text,
       video_prompt: videoPrompt.object.videoPrompt,
