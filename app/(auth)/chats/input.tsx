@@ -38,10 +38,12 @@ export default function ChatInput({
   messages,
   roomId,
   setMessages,
+  messagesContainerRef,
 }: {
   setMessages: React.Dispatch<React.SetStateAction<Tables<"chat_history">[]>>;
   messages: Tables<"chat_history">[];
   roomId: string;
+  messagesContainerRef: React.RefObject<HTMLDivElement>;
 }) {
   const [inputValue, setInputValue] = useState("");
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
@@ -93,6 +95,8 @@ export default function ChatInput({
     setMessages((prevMessages: Tables<"chat_history">[]) => {
       return [...prevMessages, ...updatedMessages];
     });
+
+    messagesContainerRef?.current?.scrollIntoView({ behavior: "smooth" });
 
     setInputValue("");
 
@@ -172,6 +176,8 @@ export default function ChatInput({
             };
             return newMessages;
           });
+
+          messagesContainerRef?.current?.scrollIntoView({ behavior: "smooth" });
 
           return audioUrl;
         }),
