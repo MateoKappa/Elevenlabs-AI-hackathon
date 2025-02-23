@@ -173,7 +173,7 @@ export default function ChatInput({
             onChange={(e) => setInputValue(e.target.value)}
           />
 
-          <Button type="submit" variant="outline" className="ms-3">
+          <Button type="submit" className="ms-3">
             Send
           </Button>
         </CardContent>
