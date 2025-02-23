@@ -8,6 +8,7 @@ import AudioBubble from "./audio-bubble";
 import StreamingText from "./streaming-text";
 import moment from "moment";
 import ImageChatBubble from "./image-bubble";
+
 function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
   const [localAudioPosition, setLocalAudioPosition] = useState(0);
   const [isFinished, setIsFinished] = useState(false);

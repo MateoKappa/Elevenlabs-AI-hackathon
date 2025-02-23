@@ -26,6 +26,7 @@ export default function ChatContent() {
     setMessages(selectedChat?.messages ?? []);
   }, [selectedChat]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: -
   useEffect(() => {
     const timer = setTimeout(() => {
       if (messagesContainerRef.current) {
