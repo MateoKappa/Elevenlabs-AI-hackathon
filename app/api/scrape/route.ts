@@ -5,6 +5,7 @@ import { generateObject, generateText } from "ai";
 import { mistral } from "@ai-sdk/mistral";
 import { upsertChat } from "@/db/chat-history/actions";
 import { validateAndUpsertChatRow } from "@/server-actions/chats";
+import { openai } from "@ai-sdk/openai";
 
 const firecrawl = new FireCrawl({
   apiKey: process.env.FIRECRAWL_API_KEY,
@@ -20,9 +21,27 @@ export const runtime = "edge";
 
 export async function POST(req: Request) {
   try {
-    const { userMessage, roomUuid } = await req.json();
+    const { userMessage, roomUuid, image } = await req.json();
 
-    console.log("checking user input");
+    if (image) {
+      const {
+        object: { story, videoPrompt, success },
+      } = await generateStoryAndVideoPrompt(image);
+
+      const chat = await validateAndUpsertChatRow(roomUuid, {
+        content: story,
+        type: "TEXT",
+        own_message: false,
+        room_uuid: roomUuid,
+      });
+
+      return NextResponse.json({
+        text: story,
+        video_prompt: videoPrompt,
+        chat_id: chat.id,
+      });
+    }
+
     const {
       object: {
         actions: { instructions, url, message, success },
@@ -150,4 +169,56 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
+}
+
+async function generateStoryAndVideoPrompt(image: string) {
+  return await generateObject({
+    model: openai("gpt-4o"),
+    schema: z.object({
+      story: z.string(),
+      videoPrompt: z.string(),
+      success: z.boolean(),
+    }),
+    messages: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: "Create a story and a video prompt for this image.",
+          },
+          {
+            type: "image",
+            image: image,
+          },
+        ],
+      },
+    ],
+    system: `You are a creative assistant. Given an image:
+      1. Generate a captivating story that describes the scene, characters, and potential narrative elements within the image.
+      2. Create a concise video prompt that describes the visual elements and scenes that would work well for AI video generation.
+
+      Story Guidelines:
+      - Develop a narrative that includes a beginning, middle, and end.
+      - Include characters, setting, and a plot twist or climax.
+      - Make it engaging and imaginative.
+
+      Video Prompt Guidelines:
+      - Focus on visual elements and scenes that represent the main ideas.
+      - Include key objects, actions, or demonstrations needed.
+      - Keep the description under 50 words and make it specific enough for video generation.
+
+      Schema Examples:
+      {
+        "story": "In the heart of the serene boardwalk, a young explorer discovers a hidden path leading to a mystical forest...",
+        "videoPrompt": "A young explorer walks along a boardwalk, discovering a hidden path to a mystical forest filled with vibrant flora.",
+        "success": true
+      }
+
+      {
+        "story": "As the sun sets over the tranquil lake, a mysterious figure emerges from the shadows, revealing a secret long forgotten...",
+        "videoPrompt": "A sunset over a lake with a mysterious figure emerging, casting long shadows and revealing hidden secrets.",
+        "success": true
+      }`,
+  });
 }

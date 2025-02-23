@@ -10,7 +10,7 @@ import type { Tables } from "@/db/database.types";
 import AudioBubble from "./audio-bubble";
 import StreamingText from "./streaming-text";
 import moment from "moment";
-
+import ImageChatBubble from "./image-bubble";
 function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
   const [localAudioPosition, setLocalAudioPosition] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
@@ -22,8 +22,6 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
   const memoizedSetLocalAudioPosition = useCallback((value: number) => {
     setLocalAudioPosition(value);
   }, []);
-
-  console.log("message", message);
 
   const isLoading =
     message.state === "creating_text" || message.state === "creating_audio";
@@ -54,8 +52,11 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
             </Card>
           )}
 
-
-          <Card className={cn({ "order-1 bg-black text-white": message.own_message })}>
+          <Card
+            className={cn({
+              "order-1 bg-black text-white": message.own_message,
+            })}
+          >
             <CardContent className="p-4 flex flex-col gap-2">
               {videoCreated && message.video && (
                 <video
@@ -68,12 +69,14 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
                 </video>
               )}
 
-              {message.audio && <AudioBubble
-                setIsFinished={memoizedSetIsFinished}
-                setLocalAudioPosition={memoizedSetLocalAudioPosition}
-                audioUrl={message.audio}
-                isLoading={isLoading}
-              />}
+              {message.audio && (
+                <AudioBubble
+                  setIsFinished={memoizedSetIsFinished}
+                  setLocalAudioPosition={memoizedSetLocalAudioPosition}
+                  audioUrl={message.audio}
+                  isLoading={isLoading}
+                />
+              )}
 
               {isLoading ? (
                 <div className="flex flex-col gap-2">
@@ -87,7 +90,13 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
                   </div>
                 </div>
               ) : (
-                <StreamingText ownMessage={message.own_message} audioUrl={message.audio} content={message.content} isFinished={isFinished} localAudioPosition={localAudioPosition} />
+                <StreamingText
+                  ownMessage={message.own_message}
+                  audioUrl={message.audio}
+                  content={message.content}
+                  isFinished={isFinished}
+                  localAudioPosition={localAudioPosition}
+                />
               )}
             </CardContent>
           </Card>
@@ -120,6 +129,8 @@ export default function ChatBubble({ message, type, audio }: ChatBubbleProps) {
   switch (type) {
     case "TEXT":
       return <TextChatBubble message={message} />;
+    case "IMAGE":
+      return <ImageChatBubble message={message} />;
     default:
       break;
   }

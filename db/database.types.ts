@@ -15,6 +15,7 @@ export type Database = {
           content: string | null
           created_at: string
           id: string
+          image: string | null
           own_message: boolean
           room_uuid: string
           state: string | null
@@ -26,6 +27,7 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          image?: string | null
           own_message?: boolean
           room_uuid: string
           state?: string | null
@@ -37,6 +39,7 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          image?: string | null
           own_message?: boolean
           room_uuid?: string
           state?: string | null
