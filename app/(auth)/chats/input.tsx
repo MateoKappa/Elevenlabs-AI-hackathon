@@ -1,38 +1,32 @@
 import { Mic, Paperclip, PlusCircleIcon, SmileIcon } from "lucide-react";
+import {} from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../../../components/ui/tooltip";
-import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { ChatMessageProps } from "@/types";
 import ShortUniqueId from "short-unique-id";
+import type { Tables } from "@/db/database.types";
 import { fal } from "@fal-ai/client";
-
+import { useRef, useEffect } from "react";
+import { Enums } from "@/db/database.types";
 fal.config({
   proxyUrl: "/api/fal",
 });
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useWavesurfer } from "@wavesurfer/react";
+import { useState } from "react";
 
 export default function ChatFooter({
   messages,
   setMessages,
-  setCurrentAudioPosition,
 }: {
-  messages: ChatMessageProps[];
-  setMessages: React.Dispatch<React.SetStateAction<ChatMessageProps[]>>;
+  setMessages: React.Dispatch<React.SetStateAction<Tables<"chat_history">[]>>;
   setCurrentAudioPosition: (position: number) => void;
+  messages: Tables<"chat_history">[];
 }) {
   const [inputValue, setInputValue] = useState("");
   const [videoUrl, setVideoUrl] = useState<string>("");
@@ -45,23 +39,34 @@ export default function ChatFooter({
   const onSubmit = async () => {
     const { randomUUID } = new ShortUniqueId({ length: 10 });
 
+    const type: Enums<"MESSAGE_TYPE"> = "TEXT";
+
     const updatedMessages = [
       {
         id: randomUUID(),
         content: inputValue,
-        type: "text",
+        type: type,
         own_message: true,
-      } as ChatMessageProps,
+        audio: null,
+        video: null,
+        state: null,
+        created_at: new Date().toISOString(),
+        room_uuid: messages[0]?.room_uuid ?? "",
+      },
       {
         id: randomUUID(),
         content: "",
-        type: "text",
+        type: type,
         own_message: false,
+        audio: null,
+        video: null,
         state: "creating_text" as const,
-      } as ChatMessageProps,
+        created_at: new Date().toISOString(),
+        room_uuid: messages[0]?.room_uuid ?? "",
+      },
     ];
 
-    setMessages((prevMessages: ChatMessageProps[]) => {
+    setMessages((prevMessages: Tables<"chat_history">[]) => {
       console.log("Previous messages (initial submit):", prevMessages);
       return [...prevMessages, ...updatedMessages];
     });
@@ -81,7 +86,7 @@ export default function ChatFooter({
 
     const { text, video_prompt } = await scrapeResponse.json();
 
-    setMessages((prevMessages: ChatMessageProps[]) => {
+    setMessages((prevMessages: Tables<"chat_history">[]) => {
       console.log("Previous messages (creating_audio):", prevMessages);
       const newMessages = [...prevMessages];
       newMessages[newMessages.length - 1] = {
@@ -104,7 +109,7 @@ export default function ChatFooter({
         .then((buffer) => {
           const audioUrl = URL.createObjectURL(new Blob([buffer]));
 
-          setMessages((prevMessages: ChatMessageProps[]) => {
+          setMessages((prevMessages: Tables<"chat_history">[]) => {
             console.log("Previous messages (creating_video):", prevMessages);
             const newMessages = [...prevMessages];
             newMessages[newMessages.length - 1] = {
@@ -134,7 +139,7 @@ export default function ChatFooter({
       })(),
     ]);
 
-    setMessages((prevMessages: ChatMessageProps[]) => {
+    setMessages((prevMessages: Tables<"chat_history">[]) => {
       console.log("Previous messages (final state):", prevMessages);
       const newMessages = [...prevMessages];
       newMessages[newMessages.length - 1] = {
@@ -150,7 +155,7 @@ export default function ChatFooter({
   };
 
   return (
-    <>
+    <form onSubmit={onSubmit}>
       <Card>
         <CardContent className="p-2 lg:p-4 flex items-center relative">
           <Input
@@ -173,55 +178,15 @@ export default function ChatFooter({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Emoji</DropdownMenuItem>
-                  <DropdownMenuItem>Add File</DropdownMenuItem>
-                  <DropdownMenuItem>Send Voice</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <div className="hidden lg:block">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="p-0 w-11 h-11 rounded-full"
-                    >
-                      <SmileIcon className="w-4 h-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Emoji</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="p-0 w-11 h-11 rounded-full"
-                    >
-                      <Paperclip className="w-4 h-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Select File</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="p-0 w-11 h-11 rounded-full"
-                    >
-                      <Mic className="w-4 h-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Send Voice</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            <Button onClick={onSubmit} variant="outline" className="ms-3">
+            <Button type="submit" variant="outline" className="ms-3">
               Send
             </Button>
           </div>
         </CardContent>
       </Card>
-    </>
+    </form>
   );
 }

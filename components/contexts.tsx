@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext } from "react";
-import {
+import type {
   SelectedChatContextType,
   SelectedContactContextType,
   SelectedStatusContextType,
