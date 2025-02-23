@@ -44,7 +44,7 @@ export async function POST(req: Request) {
 
     const {
       object: {
-        actions: { instructions, url, message, success },
+        actions: { instructions, url, success },
       },
     } = await generateObject({
       model: mistral("mistral-large-latest"),
@@ -52,7 +52,6 @@ export async function POST(req: Request) {
         actions: z.object({
           instructions: z.string(),
           url: z.string().url(),
-          message: z.string(),
           success: z.boolean(),
         }),
       }),
@@ -80,9 +79,16 @@ export async function POST(req: Request) {
     });
 
     if (!success) {
+      const message = "Your message was not clear, please try again.";
+      const chat = await validateAndUpsertChatRow(roomUuid, {
+        content: message,
+        type: "TEXT",
+        own_message: false,
+        room_uuid: roomUuid,
+      });
       return NextResponse.json({
         success: false,
-        message,
+        message: message,
       });
     }
 

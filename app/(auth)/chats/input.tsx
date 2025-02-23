@@ -56,47 +56,52 @@ export default function ChatInput({
     if (inputValue === "" && !uploadedImage) {
       return;
     }
+    const { randomUUID } = new ShortUniqueId({ length: 10 });
 
     setIsSubmitting(true);
     const image = uploadedImage;
 
     setUploadedImage(null);
 
-    const { randomUUID } = new ShortUniqueId({ length: 10 });
     const type: Enums<"MESSAGE_TYPE"> = uploadedImage ? "IMAGE" : "TEXT";
 
-    const userMessage = {
-      id: randomUUID(),
-      content: inputValue,
-      type: type,
-      own_message: true,
-      audio: null,
-      video: null,
-      image: image ? URL.createObjectURL(image) : null,
-      state: null,
-      created_at: new Date().toISOString(),
-      room_uuid: roomId,
-    };
+    const updatedMessages = [
+      {
+        id: randomUUID(),
+        content: inputValue,
+        type: type,
+        own_message: true,
+        audio: null,
+        video: null,
+        image: image ? URL.createObjectURL(image) : null,
+        state: null,
+        created_at: new Date().toISOString(),
+        room_uuid: roomId,
+      },
+      {
+        id: randomUUID(),
+        content: "",
+        type: "TEXT" as const,
+        own_message: false,
+        audio: null,
+        video: null,
+        image: null,
+        state: "creating_text" as const,
+        created_at: new Date().toISOString(),
+        room_uuid: roomId,
+      },
+    ];
 
-    const botMessage = {
-      id: randomUUID(),
-      content: "",
-      type: "TEXT" as const,
-      own_message: false,
-      audio: null,
-      video: null,
-      image: null,
-      state: "creating_text" as const,
-      created_at: new Date().toISOString(),
-      room_uuid: roomId,
-    };
+    setMessages((prevMessages: Tables<"chat_history">[]) => {
+      return [...prevMessages, ...updatedMessages];
+    });
 
-    setMessages((prevMessages) => [...prevMessages, userMessage, botMessage]);
     setInputValue("");
 
-    const imageUrl = image ? await uploadImageToSupabase(image) : null;
-
-    console.log("imageUrl", imageUrl);
+    let imageUrl = null;
+    if (image) {
+      imageUrl = await uploadImageToSupabase(image);
+    }
 
     await validateAndUpsertChatRow(roomId, {
       content: inputValue,
@@ -109,7 +114,9 @@ export default function ChatInput({
 
     const chatResponse = await fetch("/api/scrape", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         userMessage: inputValue,
         roomUuid: roomId,
@@ -117,18 +124,90 @@ export default function ChatInput({
       }),
     });
 
-    if (!chatResponse.ok) return;
+    if (!chatResponse.ok) {
+      setMessages((prevMessages: Tables<"chat_history">[]) => {
+        const newMessages = [...prevMessages];
+        newMessages[newMessages.length - 1] = {
+          ...newMessages[newMessages.length - 1],
+          state: "idle",
+          content: "Your message was not clear, please try again.",
+        };
+        return newMessages;
+      });
+      return;
+    }
 
     const { text, video_prompt, chat_id } = await chatResponse.json();
 
-    updateMessageState("creating_audio");
+    setMessages((prevMessages: Tables<"chat_history">[]) => {
+      const newMessages = [...prevMessages];
+      newMessages[newMessages.length - 1] = {
+        ...newMessages[newMessages.length - 1],
+        state: "creating_audio",
+      };
+      return newMessages;
+    });
 
     const [_audioBuffer, videoResult] = await Promise.all([
-      fetchAudio(text, roomId, chat_id),
-      fetchVideo(video_prompt, imageUrl),
+      await fetch("/api/text-to-speech", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: text,
+          roomUuid: roomId,
+          chatId: chat_id,
+        }),
+      })
+        .then((res) => res.arrayBuffer())
+        .then((buffer) => {
+          const audioUrl = URL.createObjectURL(new Blob([buffer]));
+
+          setMessages((prevMessages: Tables<"chat_history">[]) => {
+            const newMessages = [...prevMessages];
+            newMessages[newMessages.length - 1] = {
+              ...newMessages[newMessages.length - 1],
+              content: text,
+              audio: audioUrl,
+              state: "creating_video",
+            };
+            return newMessages;
+          });
+
+          return audioUrl;
+        }),
+
+      (async () => {
+        if (imageUrl) {
+          return fal.subscribe("fal-ai/minimax/video-01/image-to-video", {
+            input: {
+              prompt: video_prompt,
+              image_url: imageUrl,
+              prompt_optimizer: true,
+            },
+          });
+        }
+
+        return fal.subscribe("fal-ai/minimax/video-01-live", {
+          input: {
+            prompt: video_prompt,
+            prompt_optimizer: true,
+          },
+        });
+      })(),
     ]);
 
-    updateMessageContent(text, videoResult.data.video.url);
+    setMessages((prevMessages: Tables<"chat_history">[]) => {
+      const newMessages = [...prevMessages];
+      newMessages[newMessages.length - 1] = {
+        ...newMessages[newMessages.length - 1],
+        content: text,
+        video: videoResult.data.video.url,
+        state: "idle",
+      };
+      return newMessages;
+    });
 
     validateAndUpdateChatRow(roomId, {
       video: videoResult.data.video.url,
@@ -136,66 +215,6 @@ export default function ChatInput({
     });
 
     setIsSubmitting(false);
-  };
-
-  const updateMessageState = (state: string) => {
-    setMessages((prevMessages) => {
-      const newMessages = [...prevMessages];
-      newMessages[newMessages.length - 1].state = state;
-      return newMessages;
-    });
-  };
-
-  const updateMessageContent = (text: string, videoUrl: string) => {
-    setMessages((prevMessages) => {
-      const newMessages = [...prevMessages];
-      newMessages[newMessages.length - 1] = {
-        ...newMessages[newMessages.length - 1],
-        content: text,
-        video: videoUrl,
-        state: "idle",
-      };
-      return newMessages;
-    });
-  };
-
-  const fetchAudio = async (text: string, roomId: string, chatId: string) => {
-    const response = await fetch("/api/text-to-speech", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: text, roomUuid: roomId, chatId: chatId }),
-    });
-    const buffer = await response.arrayBuffer();
-    const audioUrl = URL.createObjectURL(new Blob([buffer]));
-
-    setMessages((prevMessages) => {
-      const newMessages = [...prevMessages];
-      newMessages[newMessages.length - 1] = {
-        ...newMessages[newMessages.length - 1],
-        content: text,
-        audio: audioUrl,
-        state: "creating_video",
-      };
-      return newMessages;
-    });
-
-    return audioUrl;
-  };
-
-  const fetchVideo = async (video_prompt: string, imageUrl: string | null) => {
-    const subscription = imageUrl
-      ? fal.subscribe("fal-ai/minimax/video-01/image-to-video", {
-        input: {
-          prompt: video_prompt,
-          image_url: imageUrl,
-          prompt_optimizer: true,
-        },
-      })
-      : fal.subscribe("fal-ai/minimax/video-01-live", {
-        input: { prompt: video_prompt, prompt_optimizer: true },
-      });
-
-    return subscription;
   };
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -268,7 +287,7 @@ export default function ChatInput({
               onChange={handleFileChange}
             />
 
-            <Button type="submit" className="ms-3">
+            <Button type="submit" variant="outline" className="ms-3">
               Send
             </Button>
           </CardContent>
