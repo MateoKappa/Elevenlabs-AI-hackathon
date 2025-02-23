@@ -55,7 +55,7 @@ export default function ChatContent() {
           <div className="flex flex-col items-start py-8 space-y-10 ">
             {chat &&
               chat.length > 0 &&
-              chat.map((item: ChatMessageProps) => (
+              chat.map((item) => (
                 <ChatBubble
                   message={item}
                   type={item.type ?? "text"}
