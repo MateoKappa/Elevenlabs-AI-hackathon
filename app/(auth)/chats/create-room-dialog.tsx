@@ -27,6 +27,8 @@ function CreateRoomDialog() {
 
     setRoomName("");
     setOpen(false);
+
+    window.location.reload();
   };
 
   return (

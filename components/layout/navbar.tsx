@@ -1,7 +1,7 @@
 "use client";
 
 import { Menu } from "lucide-react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -24,10 +24,21 @@ import { cn } from "@/lib/utils";
 import { ToggleTheme } from "./toogle-theme";
 import Logo from "./logo";
 import { routeList } from "@/data/navbar";
-import { createClient } from "@/supabase/client";
+import { getUser, logout } from "@/server-actions/auth";
+import { useRouter } from "next/navigation";
 
 export const Navbar = () => {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  // biome-ignore lint/suspicious/noExplicitAny: -
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    (async () => {
+      const user = await getUser();
+      setUser(user);
+    })()
+  }, [])
 
   return (
     <header className="sticky top-2 lg:top-5 z-40 mb-10">
@@ -98,23 +109,34 @@ export const Navbar = () => {
             </NavigationMenuList>
           </NavigationMenu>
 
-          <div className="hidden lg:flex">
+          <div className="flex">
             <ToggleTheme />
 
-            <Button
-              asChild
-              size="sm"
-              className="ms-2"
-              aria-label="Join"
-            >
-              <Link
+            {!user?.user ?
+              <Button
+                asChild
+                size="sm"
+                className="ms-2"
                 aria-label="Join"
-                href="/login"
-                target="_blank"
               >
-                Join
-              </Link>
-            </Button>
+                <Link
+                  aria-label="Join"
+                  href="/login"
+                >
+                  Join
+                </Link>
+              </Button>
+              :
+              <Button
+                size="sm"
+                className="ms-2"
+                onClick={() => {
+                  logout()
+                  router.refresh()
+                }}
+              >
+                Logout
+              </Button>}
           </div>
         </div>
       </div>
