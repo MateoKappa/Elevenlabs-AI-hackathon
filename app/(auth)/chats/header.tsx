@@ -29,6 +29,7 @@ export default function ChatHeader({ user }: {
         <UserAvatar
           fallback={generateAvatarFallback(user.name)}
         />
+
         <div className="flex flex-col">
           <span className="font-semibold">{user.name}</span>
         </div>

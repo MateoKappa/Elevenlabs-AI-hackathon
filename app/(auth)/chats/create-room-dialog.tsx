@@ -31,7 +31,7 @@ function CreateRoomDialog() {
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
+      <AlertDialogTrigger className="ml-auto" asChild>
         <Button variant="outline">
           <PlusCircleIcon className="w-4 h-4 mr-2" />
           Create
