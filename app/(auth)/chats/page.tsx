@@ -9,7 +9,7 @@ export default async function Page() {
   const rooms = Array.isArray(roomsData) ? roomsData : [];
 
   return (
-    <div className="h-screen lg:flex gap-8 p-4">
+    <div className="h-screen overflow-hidden lg:flex gap-8 p-4">
       <div className="h-full w-full lg:w-96">
         <Card className="h-full">
           <CardHeader className="py-4 lg:py-6">

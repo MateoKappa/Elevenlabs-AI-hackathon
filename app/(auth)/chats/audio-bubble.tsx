@@ -66,13 +66,13 @@ const AudioBubble = memo(({ isLoading, audioUrl, setIsFinished, setLocalAudioPos
 	}, [wavesurfer, setIsFinished, setLocalAudioPosition, isDestroyed]);
 
 	return (
-		<div className="flex flex-row items-center gap-1 rounded-xl border-b min-w-[550px] px-3 py-1 text-sm">
+		<div className="flex flex-row items-center gap-1 rounded-xl border-b w-full px-3 py-1 text-sm">
 			{isLoading ? (
-				<div className="w-full h-11 bg-bright-plum-50/20 rounded-full animate-pulse" />
+				<div className="w-full h-11 rounded-full animate-pulse" />
 			) : (
 				<>
 					<button
-						className="shrink-0 text-bright-plum"
+						className="shrink-0"
 						type="button"
 						onClick={playPause}
 					>
