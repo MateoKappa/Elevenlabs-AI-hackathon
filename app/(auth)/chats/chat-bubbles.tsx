@@ -54,7 +54,8 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
 
           <Card
             className={cn({
-              "order-1 bg-black text-white": message.own_message,
+              "order-1 bg-black text-white dark:bg-gray-900":
+                message.own_message,
             })}
           >
             <CardContent className="p-4 flex flex-col gap-2">

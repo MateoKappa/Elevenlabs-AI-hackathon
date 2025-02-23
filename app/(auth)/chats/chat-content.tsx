@@ -31,16 +31,7 @@ export default function ChatContent() {
   if (!selectedChat) {
     return (
       <figure className="text-center h-full hidden lg:flex items-center justify-center">
-        <img
-          className="max-w-sm block dark:hidden"
-          src="/not-selected-chat.svg"
-          alt="..."
-        />
-        <img
-          className="max-w-sm hidden dark:block"
-          src="/not-selected-chat-light.svg"
-          alt="..."
-        />
+        <p className="text-muted-foreground">No chat selected.</p>
       </figure>
     );
   }

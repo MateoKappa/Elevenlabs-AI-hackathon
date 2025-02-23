@@ -30,14 +30,15 @@ export function TeamSection() {
 
   return (
     <SectionContainer id="team">
-      <SectionHeader subTitle="Team" title="The Company Dream Team" />
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <SectionHeader subTitle="Team" title="The Project Team" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 w-fit mx-auto">
         {teamList.map(
           (
             { imageUrl, firstName, lastName, positions, socialNetworks },
             index
           ) => (
             <Card
+              // biome-ignore lint/suspicious/noArrayIndexKey: -
               key={index}
               className="bg-muted flex flex-col h-full overflow-hidden group/hoverimg"
             >
@@ -58,10 +59,10 @@ export function TeamSection() {
               </CardHeader>
               {positions.map((position, index) => (
                 <CardContent
+                  // biome-ignore lint/suspicious/noArrayIndexKey: -
                   key={index}
-                  className={`pb-0 text-muted-foreground ${
-                    index === positions.length - 1 && "pb-6"
-                  }`}
+                  className={`pb-0 text-muted-foreground ${index === positions.length - 1 && "pb-6"
+                    }`}
                 >
                   {position}
                   {index < positions.length - 1 && <span>,</span>}
@@ -71,6 +72,7 @@ export function TeamSection() {
               <CardFooter className="space-x-4 mt-auto">
                 {socialNetworks.map(({ name, url }, index) => (
                   <Link
+                    // biome-ignore lint/suspicious/noArrayIndexKey: -
                     key={index}
                     href={url}
                     target="_blank"

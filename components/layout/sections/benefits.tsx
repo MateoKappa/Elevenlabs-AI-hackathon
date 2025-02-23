@@ -2,7 +2,7 @@ import { benefitList } from "@/data/benefits";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Icon } from "@/components/ui/extras/icon";
 import { cn } from "@/lib/utils";
-import { icons } from "lucide-react";
+import type { icons } from "lucide-react";
 import SectionContainer from "../section-container";
 import SectionHeader from "../section-header";
 

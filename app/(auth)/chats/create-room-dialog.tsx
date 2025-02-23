@@ -20,6 +20,7 @@ import { useState } from "react";
 function CreateRoomDialog() {
   const [roomName, setRoomName] = useState("");
   const router = useRouter();
+  const [open, setOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,11 +44,12 @@ function CreateRoomDialog() {
       .throwOnError();
 
     setRoomName("");
+    setOpen(false);
     router.refresh();
   };
 
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button variant="outline">
           <PlusCircleIcon className="w-4 h-4 mr-2" />

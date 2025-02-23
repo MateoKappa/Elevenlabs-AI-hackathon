@@ -84,42 +84,6 @@ export const Navbar = () => {
           <NavigationMenu className="hidden lg:block mx-auto">
             <NavigationMenuList className="space-x-0">
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:!bg-transparent">
-                  Products
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="w-[300px] gap-5 p-2">
-                    <ul className="flex flex-col">
-                      {productList.map(({ title, description, icon }) => (
-                        <li key={title}>
-                          <Link
-                            href="/"
-                            className="flex gap-6 items-start rounded-md p-4 text-sm hover:bg-muted"
-                          >
-                            <div className="flex items-center justify-center size-8 bg-primary/20 p-2 rounded-full ring-8 ring-primary/10 mb-4">
-                              <Icon
-                                name={icon as keyof typeof icons}
-                                color="hsl(var(--primary))"
-                                className="text-primary flex-shrink-0 size-5"
-                              />
-                            </div>
-                            <div>
-                              <p className="mb-1 font-semibold leading-none text-foreground">
-                                {title}
-                              </p>
-                              <p className="line-clamp-2 text-muted-foreground">
-                                {description}
-                              </p>
-                            </div>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-
-              <NavigationMenuItem>
                 {routeList.map(({ href, label }) => (
                   <NavigationMenuLink
                     key={href}

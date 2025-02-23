@@ -263,7 +263,7 @@ export default function ChatInput({
             onChange={handleFileChange}
           />
 
-          <Button type="submit" variant="outline" className="ms-3">
+          <Button type="submit" className="ms-3">
             Send
           </Button>
         </CardContent>
