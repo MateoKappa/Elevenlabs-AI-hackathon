@@ -102,6 +102,7 @@ export async function POST(req: Request) {
         - Use natural transitions between topics
         - Maintain a conversational tone
         - Conclude with a clear wrap-up
+        - DO NOT START WITH "Imagine this"
 
         ### Content
         ${content}

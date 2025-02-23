@@ -43,6 +43,7 @@ function CreateRoomDialog() {
       .throwOnError();
 
     setRoomName("");
+
     router.refresh();
   };
 
