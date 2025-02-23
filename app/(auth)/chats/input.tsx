@@ -27,16 +27,13 @@ export default function ChatFooter({
   messages: Tables<"chat_history">[];
 }) {
   const [inputValue, setInputValue] = useState("");
-  const [videoUrl, setVideoUrl] = useState<string>("");
   const messagesRef = useRef(messages);
 
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const onSubmit = async () => {
     const { randomUUID } = new ShortUniqueId({ length: 10 });
 
     const type: Enums<"MESSAGE_TYPE"> = "TEXT";
@@ -76,17 +73,16 @@ export default function ChatFooter({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ userMessage: inputValue }),
+      body: JSON.stringify({ userMessage: inputValue, roomUuid: messages[0]?.room_uuid }),
     });
 
     if (!scrapeResponse.ok) {
       return;
     }
 
-    const { text, video_prompt } = await scrapeResponse.json();
+    const { text, video_prompt, chat_id } = await scrapeResponse.json();
 
     setMessages((prevMessages: Tables<"chat_history">[]) => {
-      console.log("Previous messages (creating_audio):", prevMessages);
       const newMessages = [...prevMessages];
       newMessages[newMessages.length - 1] = {
         ...newMessages[newMessages.length - 1],
@@ -95,20 +91,19 @@ export default function ChatFooter({
       return newMessages;
     });
 
-    const [audioBuffer, videoResult] = await Promise.all([
+    const [_audioBuffer, videoResult] = await Promise.all([
       fetch("/api/text-to-speech", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ content: text }),
+        body: JSON.stringify({ content: text, roomUuid: messages[0]?.room_uuid, chatId: chat_id }),
       })
         .then((res) => res.arrayBuffer())
         .then((buffer) => {
           const audioUrl = URL.createObjectURL(new Blob([buffer]));
 
           setMessages((prevMessages: Tables<"chat_history">[]) => {
-            console.log("Previous messages (creating_video):", prevMessages);
             const newMessages = [...prevMessages];
             newMessages[newMessages.length - 1] = {
               ...newMessages[newMessages.length - 1],
@@ -116,17 +111,15 @@ export default function ChatFooter({
               audio: audioUrl,
               state: "creating_video",
             };
-            console.log("New messages (creating_video):", newMessages);
             return newMessages;
           });
 
           return audioUrl;
         }),
-
       (async () => {
         return fal.subscribe("fal-ai/minimax/video-01-live", {
           input: {
-            prompt: text.slice(0, 150),
+            prompt: video_prompt.slice(0, 150),
             prompt_optimizer: true,
           },
           logs: true,
@@ -137,8 +130,9 @@ export default function ChatFooter({
       })(),
     ]);
 
+    console.log({ url: videoResult.data.video.url });
+
     setMessages((prevMessages: Tables<"chat_history">[]) => {
-      console.log("Previous messages (final state):", prevMessages);
       const newMessages = [...prevMessages];
       newMessages[newMessages.length - 1] = {
         ...newMessages[newMessages.length - 1],
@@ -148,8 +142,6 @@ export default function ChatFooter({
       };
       return newMessages;
     });
-
-    setVideoUrl(videoResult.data.video.url);
   };
 
   return (
@@ -160,34 +152,18 @@ export default function ChatFooter({
       }}
     >
       <Card>
-        <CardContent className="p-2 lg:p-4 flex items-center relative">
+        <CardContent className="flex items-center justify-between p-2 lg:p-4">
           <Input
             type="text"
-            className="border-transparent !text-base !ring-transparent !shadow-transparent pe-32 lg:pe-56"
+            className="border-transparent !text-base !ring-transparent !shadow-transparent w-full"
             placeholder="Enter message..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
           />
-          <div className="absolute flex items-center end-4">
-            <div className="block lg:hidden">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="p-0 w-11 h-11 rounded-full"
-                  >
-                    <PlusCircleIcon className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuSeparator />
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            <Button type="submit" variant="outline" className="ms-3">
-              Send
-            </Button>
-          </div>
+
+          <Button type="submit" variant="outline" className="ms-3">
+            Send
+          </Button>
         </CardContent>
       </Card>
     </form>
