@@ -61,7 +61,10 @@ const AudioBubble = memo(
       const handleReady = () => {
         if (!showedMessage && state === "database") {
           setLocalAudioPosition(wavesurfer.getDuration());
+          setShowedMessage(true);
+          return;
         }
+        wavesurfer.play();
       };
 
       const handleInteraction = () => {
