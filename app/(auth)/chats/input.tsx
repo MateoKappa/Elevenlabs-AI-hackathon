@@ -123,6 +123,15 @@ export default function ChatInput({
     });
 
     if (!chatResponse.ok) {
+      setMessages((prevMessages: Tables<"chat_history">[]) => {
+        const newMessages = [...prevMessages];
+        newMessages[newMessages.length - 1] = {
+          ...newMessages[newMessages.length - 1],
+          state: "idle",
+          content: "Your message was not clear, please try again.",
+        };
+        return newMessages;
+      });
       return;
     }
 
