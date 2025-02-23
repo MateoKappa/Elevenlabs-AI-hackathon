@@ -4,6 +4,7 @@ import { z } from "zod";
 import { generateObject, generateText } from "ai";
 import { mistral } from "@ai-sdk/mistral";
 import { upsertChat } from "@/db/chat-history/actions";
+import { validateAndUpsertChatRow } from "@/server-actions/chats";
 
 const firecrawl = new FireCrawl({
   apiKey: process.env.FIRECRAWL_API_KEY,
@@ -130,7 +131,12 @@ export async function POST(req: Request) {
       }),
     ]);
 
-    const chat = await upsertChat(roomUuid, textResult.object.text, null, null);
+    const chat = await validateAndUpsertChatRow(roomUuid, {
+      content: textResult.object.text,
+      type: "TEXT",
+      own_message: false,
+      room_uuid: roomUuid,
+    });
 
     return NextResponse.json({
       text: textResult.object.text,

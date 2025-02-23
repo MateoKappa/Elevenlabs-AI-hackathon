@@ -2,7 +2,7 @@
 
 import type { Tables } from "@/db/database.types";
 import { createClient } from "@/supabase/server";
-import { updateChat } from "@/db/chat-history/actions";
+import { updateChat, upsertChat } from "@/db/chat-history/actions";
 import { getRoom } from "@/db/rooms/actions";
 
 export async function getChats() {
@@ -49,6 +49,35 @@ export async function getChats() {
     throw error;
   }
 }
+
+export async function validateAndUpsertChatRow(
+  roomId: string,
+  updates: Partial<Tables<"chat_history">>
+) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) throw new Error("User not found");
+
+    const room = await getRoom(roomId);
+
+    if (!room) throw new Error("Room not found");
+
+    const message = await upsertChat({ ...updates, room_uuid: roomId });
+
+    if (!message) throw new Error("Error updating chat");
+
+    return message;
+  } catch (error) {
+    console.error("Error updating chat:", error);
+    throw error;
+  }
+}
+
 
 export async function validateAndUpdateChatRow(
   roomId: string,

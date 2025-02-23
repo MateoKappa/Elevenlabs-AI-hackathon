@@ -9,6 +9,7 @@ import { useCallback } from "react";
 import type { Tables } from "@/db/database.types";
 import AudioBubble from "./audio-bubble";
 import StreamingText from "./streaming-text";
+import moment from "moment";
 
 function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
   const [localAudioPosition, setLocalAudioPosition] = useState(0);
@@ -52,6 +53,7 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
               </CardContent>
             </Card>
           )}
+
           {videoCreated && (
             <Card className="w-full">
               <CardContent className="p-4 ">
@@ -67,7 +69,8 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
               </CardContent>
             </Card>
           )}
-          <Card className={cn({ "order-1": message.own_message })}>
+
+          <Card className={cn({ "order-1 bg-black text-white": message.own_message })}>
             <CardContent className="p-4 flex flex-col">
               {isLoading ? (
                 <div className="flex flex-col gap-2">
@@ -105,7 +108,7 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
             { "justify-end": message.own_message }
           )}
         >
-          05:23 PM
+          {moment(message.created_at).format("DD MM HH:mm")}
         </time>
       </div>
     </div>

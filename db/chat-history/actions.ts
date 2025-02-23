@@ -1,28 +1,18 @@
 "server only";
 import { createClient } from "@/supabase/server";
-import { Tables } from "../database.types";
-import { User } from "@supabase/supabase-js";
+import type { Tables } from "../database.types";
+
+export type ChatHistoryUpdate = Omit<Partial<Tables<"chat_history">>, "room_uuid"> & { room_uuid: string };
 
 export async function upsertChat(
-  room_uuid: string,
-  content: string,
-  audio: string | null,
-  video: string | null,
-  chat_id?: string
+  updates: ChatHistoryUpdate
 ) {
   try {
     const supabase = await createClient();
 
     const { data } = await supabase
       .from("chat_history")
-      .upsert({
-        id: chat_id,
-        room_uuid,
-        content,
-        audio,
-        video,
-        type: "TEXT",
-      })
+      .upsert(updates)
       .select()
       .throwOnError();
 
