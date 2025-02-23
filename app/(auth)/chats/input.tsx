@@ -45,6 +45,7 @@ export default function ChatInput({
 }) {
   const [inputValue, setInputValue] = useState("");
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const messagesRef = useRef(messages);
 
   useEffect(() => {
@@ -56,6 +57,7 @@ export default function ChatInput({
       return;
     }
 
+    setIsSubmitting(true);
     const image = uploadedImage;
 
     setUploadedImage(null);
@@ -132,6 +134,8 @@ export default function ChatInput({
       video: videoResult.data.video.url,
       id: chat_id,
     });
+
+    setIsSubmitting(false);
   };
 
   const updateMessageState = (state: string) => {
@@ -181,15 +185,15 @@ export default function ChatInput({
   const fetchVideo = async (video_prompt: string, imageUrl: string | null) => {
     const subscription = imageUrl
       ? fal.subscribe("fal-ai/minimax/video-01/image-to-video", {
-          input: {
-            prompt: video_prompt,
-            image_url: imageUrl,
-            prompt_optimizer: true,
-          },
-        })
+        input: {
+          prompt: video_prompt,
+          image_url: imageUrl,
+          prompt_optimizer: true,
+        },
+      })
       : fal.subscribe("fal-ai/minimax/video-01-live", {
-          input: { prompt: video_prompt, prompt_optimizer: true },
-        });
+        input: { prompt: video_prompt, prompt_optimizer: true },
+      });
 
     return subscription;
   };
@@ -221,53 +225,55 @@ export default function ChatInput({
         onSubmit();
       }}
     >
-      <Card>
-        <CardContent className="flex items-center justify-between p-2 lg:p-4">
-          {uploadedImage && (
-            <div className="relative w-10 h-10 rounded-sm ">
-              <img
-                src={URL.createObjectURL(uploadedImage)}
-                alt="Uploaded"
-                className="w-full h-full object-cover"
-              />
-              <button
-                type="button"
-                onClick={() => setUploadedImage(null)}
-                className="absolute -top-2 -right-2 bg-white text-black rounded-full p-1"
-                aria-label="Remove image"
-              >
-                <X className="w-2.5 h-2.5" />
-              </button>
-            </div>
-          )}
+      <fieldset disabled={isSubmitting}>
+        <Card>
+          <CardContent className="flex items-center justify-between p-2 lg:p-4">
+            {uploadedImage && (
+              <div className="relative w-10 h-10 rounded-sm ">
+                <img
+                  src={URL.createObjectURL(uploadedImage)}
+                  alt="Uploaded"
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => setUploadedImage(null)}
+                  className="absolute -top-2 -right-2 bg-white text-black rounded-full p-1"
+                  aria-label="Remove image"
+                >
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </div>
+            )}
 
-          <Input
-            type="text"
-            className="border-transparent !text-base !ring-transparent !shadow-transparent w-full"
-            placeholder="Enter message..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-          />
-          <Button
-            type="button"
-            onClick={handleUpload}
-            variant="outline"
-            className="ms-3 p-2"
-          >
-            <Image className="w-6 h-6" />
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            className="hidden"
-            onChange={handleFileChange}
-          />
+            <Input
+              type="text"
+              className="border-transparent !text-base !ring-transparent !shadow-transparent w-full"
+              placeholder="Enter message..."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+            />
+            <Button
+              type="button"
+              onClick={handleUpload}
+              variant="outline"
+              className="ms-3 p-2"
+            >
+              <Image className="w-6 h-6" />
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              onChange={handleFileChange}
+            />
 
-          <Button type="submit" className="ms-3">
-            Send
-          </Button>
-        </CardContent>
-      </Card>
+            <Button type="submit" className="ms-3">
+              Send
+            </Button>
+          </CardContent>
+        </Card>
+      </fieldset>
     </form>
   );
 }

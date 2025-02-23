@@ -4,6 +4,8 @@ import type { Tables } from "@/db/database.types";
 import { createClient } from "@/supabase/server";
 import { updateChat, upsertChat } from "@/db/chat-history/actions";
 import { getRoom } from "@/db/rooms/actions";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function getChats() {
   try {
@@ -105,4 +107,24 @@ export async function validateAndUpdateChatRow(
     console.error("Error updating chat:", error);
     throw error;
   }
+}
+
+export async function createRoom(roomName: string) {
+  if (!roomName.trim()) return;
+
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
+  await supabase
+    .from("rooms")
+    .insert({
+      name: roomName.trim(),
+      user_uuid: user.id,
+    })
+    .throwOnError();
 }

@@ -41,7 +41,7 @@ export default function ChatList({ rooms }: { rooms: ChatRoomProps[] }) {
           onChange={changeHandle}
         />
       </div>
-      <div className="h-[calc(100vh_-_13rem)] lg:h-[calc(100vh_-_15.8rem)] flex lg:pt-4">
+      <div className="h-full flex lg:pt-4">
         <ScrollArea className="w-full min-w-0">
           <div className="block divide-y min-w-0">
             {filteredChats.length ? (

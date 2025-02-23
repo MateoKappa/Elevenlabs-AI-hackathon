@@ -1,18 +1,9 @@
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-
 import { CardContent } from "@/components/ui/card";
-import {
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { Ellipsis } from "lucide-react";
-import { Tables } from "@/db/database.types";
+import type { Tables } from "@/db/database.types";
 import MessageStatusIcon from "./message-status-icon";
+import moment from "moment";
 
 export default function ImageChatBubble({
   message,
@@ -41,31 +32,12 @@ export default function ImageChatBubble({
                 <img
                   className="aspect-[4/3] object-cover"
                   src={image}
-                  alt="image"
+                  alt="image-message"
                 />
               </figure>
             )}
           </CardContent>
         </Card>
-        <div className={cn({ "order-2": !message.own_message })}>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost">
-                <Ellipsis className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-40">
-              <DropdownMenuGroup>
-                <DropdownMenuItem>Forward</DropdownMenuItem>
-                <DropdownMenuItem>Star</DropdownMenuItem>
-                {message.own_message && (
-                  <DropdownMenuItem>Edit</DropdownMenuItem>
-                )}
-                <DropdownMenuItem>Delete</DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
       </div>
       <div
         className={cn("flex items-center gap-2", {
@@ -78,9 +50,8 @@ export default function ImageChatBubble({
             { "justify-end": message.own_message }
           )}
         >
-          05:23 PM
+          {moment(message.created_at).format("DD MM HH:mm")}
         </time>
-        {message.own_message && <MessageStatusIcon status="read" />}
       </div>
     </div>
   );
