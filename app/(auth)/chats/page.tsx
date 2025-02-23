@@ -3,6 +3,9 @@ import LeftList from "@/app/(auth)/chats/left-list";
 import ChatContent from "@/app/(auth)/chats/chat-content";
 import { getChats } from "@/server-actions/chats";
 import CreateRoomDialog from "./create-room-dialog";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default async function Page() {
   const roomsData = await getChats();
@@ -16,6 +19,11 @@ export default async function Page() {
         <Card className="h-full">
           <CardHeader className="py-4 lg:py-6">
             <div className="flex items-center justify-between">
+              <Button asChild className="mr-2" variant="outline" size="icon">
+                <Link href="/">
+                  <ArrowLeft className="w-4 h-4" />
+                </Link>
+              </Button>
               <CardTitle className="font-bold">Rooms</CardTitle>
               <CreateRoomDialog />
             </div>
