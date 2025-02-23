@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ThemeProvider } from "next-themes";
 import {
   UserProfileContext,
@@ -8,8 +8,7 @@ import {
   SelectedContactContext,
   SelectedStatusContext,
 } from "./contexts";
-import {
-  ChatItemProps,
+import type {
   ChatRoomProps,
   StatusItemProps,
   UserPropsTypes,
