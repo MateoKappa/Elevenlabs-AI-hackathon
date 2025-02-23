@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { ElevenLabsClient } from "elevenlabs";
 import { createClient } from "@/supabase/server";
 import ShortUniqueId from "short-unique-id";
-import { upsertChat } from "@/server-actions/chats";
+import { upsertChat } from "@/db/chat-history/actions";
 
 const client = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
 
@@ -29,8 +29,7 @@ export async function POST(req: Request) {
     const { randomUUID } = new ShortUniqueId({ length: 10 });
 
     const supabase = await createClient();
-    const { data, error } = await supabase
-      .storage
+    const { data, error } = await supabase.storage
       .from("audio")
       .upload(`${randomUUID()}.mp3`, audioBuffer);
 

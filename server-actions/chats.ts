@@ -1,12 +1,14 @@
+"use server";
+import { Tables } from "@/db/database.types";
 import { createClient } from "@/supabase/server";
+import { updateChat } from "@/db/chat-history/actions";
 
 export async function getChats() {
   try {
     const supabase = await createClient();
 
-    const { data: user } = await supabase //
-    	.auth
-    	.getUser()
+    const { data: user } = await supabase.auth //
+      .getUser();
 
     if (!user || !user.user) throw new Error("User not found");
 
@@ -46,26 +48,27 @@ export async function getChats() {
   }
 }
 
-export async function upsertChat(room_uuid: string, content: string, audio: string | null, video: string | null, chat_id?: string) {
+export async function validateAndUpdateChatRow(
+  chatId: string,
+  updates: Partial<Tables<"chat_history">>
+) {
   try {
     const supabase = await createClient();
 
-    const { data } = await supabase
-      .from("chat_history")
-      .upsert({
-        id: chat_id,
-        room_uuid,
-        content,
-        audio,
-        video,
-        type: "TEXT",
-      })
-      .select()
-      .throwOnError();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    return data[0];
+    if (!user) throw new Error("User not found");
+
+    // Update the chat with the provided updates
+    const error = await updateChat(chatId, updates, user);
+
+    if (error) throw new Error("Error updating chat");
+
+    return true;
   } catch (error) {
-    console.error(error);
+    console.error("Error updating chat:", error);
     throw error;
   }
 }

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { generateObject, generateText } from "ai";
 import { mistral } from "@ai-sdk/mistral";
-import { upsertChat } from "@/server-actions/chats";
+import { upsertChat } from "@/db/chat-history/actions";
 
 const firecrawl = new FireCrawl({
   apiKey: process.env.FIRECRAWL_API_KEY,

@@ -1,6 +1,15 @@
-'use client'
+"use client";
 
-import { AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogHeader, AlertDialogTrigger, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogHeader,
+  AlertDialogTrigger,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/supabase/client";
@@ -9,63 +18,66 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 function CreateRoomDialog() {
-	const [roomName, setRoomName] = useState("");
-	const router = useRouter();
+  const [roomName, setRoomName] = useState("");
+  const router = useRouter();
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-		if (!roomName.trim()) return;
+    if (!roomName.trim()) return;
 
-		const supabase = createClient();
+    const supabase = createClient();
 
-		const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-		if (!user) return;
+    if (!user) return;
 
-		await supabase
-			.from("rooms")
-			.insert({
-				name: roomName.trim(),
-				user_uuid: user.id,
-			}).throwOnError();
+    await supabase
+      .from("rooms")
+      .insert({
+        name: roomName.trim(),
+        user_uuid: user.id,
+      })
+      .throwOnError();
 
-		setRoomName("");
-		router.refresh();
-	};
+    setRoomName("");
+    router.refresh();
+  };
 
-	return (
-		<AlertDialog>
-			<AlertDialogTrigger>
-				<Button variant="outline">
-					<PlusCircleIcon className="w-4 h-4 mr-2" />
-					Create
-				</Button>
-			</AlertDialogTrigger>
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="outline">
+          <PlusCircleIcon className="w-4 h-4 mr-2" />
+          Create
+        </Button>
+      </AlertDialogTrigger>
 
-			<AlertDialogContent>
-				<form onSubmit={handleSubmit}>
-					<AlertDialogHeader>
-						<AlertDialogTitle>Create New Room</AlertDialogTitle>
-					</AlertDialogHeader>
+      <AlertDialogContent>
+        <form onSubmit={handleSubmit}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Create New Room</AlertDialogTitle>
+          </AlertDialogHeader>
 
-					<div className="py-4">
-						<Input
-							placeholder="Enter room name"
-							value={roomName}
-							onChange={(e) => setRoomName(e.target.value)}
-							autoFocus
-						/>
-					</div>
+          <div className="py-4">
+            <Input
+              placeholder="Enter room name"
+              value={roomName}
+              onChange={(e) => setRoomName(e.target.value)}
+              autoFocus
+            />
+          </div>
 
-					<AlertDialogFooter>
-						<AlertDialogCancel type="button">Cancel</AlertDialogCancel>
-						<AlertDialogAction type="submit">Create Room</AlertDialogAction>
-					</AlertDialogFooter>
-				</form>
-			</AlertDialogContent>
-		</AlertDialog>
-	);
-};
+          <AlertDialogFooter>
+            <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
+            <AlertDialogAction type="submit">Create Room</AlertDialogAction>
+          </AlertDialogFooter>
+        </form>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
 
 export default CreateRoomDialog;
