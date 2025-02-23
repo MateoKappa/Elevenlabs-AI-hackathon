@@ -54,24 +54,27 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
             </Card>
           )}
 
-          {videoCreated && (
-            <Card className="w-full">
-              <CardContent className="p-4 ">
-                {message.video && (
-                  <video
-                    className="rounded-lg w-full max-w-[550px]"
-                    controls
-                    src={message.video}
-                  >
-                    <track kind="captions" />
-                  </video>
-                )}
-              </CardContent>
-            </Card>
-          )}
 
           <Card className={cn({ "order-1 bg-black text-white": message.own_message })}>
-            <CardContent className="p-4 flex flex-col">
+            <CardContent className="p-4 flex flex-col gap-2">
+              {videoCreated && message.video && (
+                <video
+                  className="rounded-lg w-full max-w-[550px]"
+                  controls
+                  src={message.video}
+                  loop
+                >
+                  <track kind="captions" />
+                </video>
+              )}
+
+              {message.audio && <AudioBubble
+                setIsFinished={memoizedSetIsFinished}
+                setLocalAudioPosition={memoizedSetLocalAudioPosition}
+                audioUrl={message.audio}
+                isLoading={isLoading}
+              />}
+
               {isLoading ? (
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
@@ -86,13 +89,6 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
               ) : (
                 <StreamingText ownMessage={message.own_message} audioUrl={message.audio} content={message.content} isFinished={isFinished} localAudioPosition={localAudioPosition} />
               )}
-
-              {message.audio && <AudioBubble
-                setIsFinished={memoizedSetIsFinished}
-                setLocalAudioPosition={memoizedSetLocalAudioPosition}
-                audioUrl={message.audio}
-                isLoading={isLoading}
-              />}
             </CardContent>
           </Card>
         </div>
