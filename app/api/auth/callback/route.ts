@@ -2,6 +2,19 @@ import { NextResponse } from "next/server";
 // The client you created from the Server-Side Auth instructions
 import { createClient } from "@/supabase/server";
 
+const getURL = () => {
+  const isDevelopment = process.env.VERCEL_ENV !== "production";
+
+  let url =
+    process?.env?.VERCEL_URL ??
+    process?.env?.VERCEL_BRANCH_URL ??
+    "http://localhost:3000/";
+
+  url = url.startsWith("http") ? url : `https://${url}`;
+  url = url.endsWith("/") ? url : `${url}/`;
+  return url;
+};
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
@@ -13,15 +26,7 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     console.log({ error });
     if (!error) {
-      const forwardedHost = request.headers.get("x-forwarded-host"); // original origin before load balancer
-      const isLocalEnv = process.env.NODE_ENV === "development";
-      if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${next}`);
-      }
-      if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`);
-      }
-      return NextResponse.redirect(`${origin}${next}`);
+      return NextResponse.redirect(`${getURL()}${next}`);
     }
   }
 
