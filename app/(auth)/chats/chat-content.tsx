@@ -53,7 +53,7 @@ export default function ChatContent() {
   console.log(!!chat, chat, chat.length, chat.length > 0);
 
   return (
-    <div className="flex flex-col z-50 inset-0 bg-background lg:bg-transparent fixed lg:relative p-4 lg:p-0">
+    <div className="h-full flex justify-between flex-col z-50 inset-0 bg-background lg:bg-transparent fixed lg:relative p-4 lg:p-0">
       <ScrollArea className="w-full h-screen lg:h-[calc(100vh_-_13.8rem)] py-4 relative">
         <div ref={messagesContainerRef}>
           <div className="flex flex-col items-start py-8 space-y-10 ">
@@ -72,7 +72,7 @@ export default function ChatContent() {
 
       <Input messages={messages} setMessages={setMessages} />
 
-      <UserDetailSheet user={selectedChat.user} />
+      {/* <UserDetailSheet user={selectedChat.user} /> */}
     </div>
   );
 }

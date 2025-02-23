@@ -2,25 +2,14 @@ import { cn } from "@/lib/utils";
 
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import {
-  Ellipsis,
-  FileIcon,
   PauseCircle,
   PlayCircle,
-  PlayIcon,
 } from "lucide-react";
 import MessageStatusIcon from "./message-status-icon";
 import { useWavesurfer } from "@wavesurfer/react";
 import { useEffect, useRef, useState } from "react";
 import { useCallback } from "react";
-import { Tables } from "@/db/database.types";
+import type { Tables } from "@/db/database.types";
 
 interface ChatBubbleProps {
   message: Tables<"chat_history">;
@@ -204,7 +193,6 @@ export default function ChatBubble({ message, type, audio }: ChatBubbleProps) {
   switch (type) {
     case "TEXT":
       return <TextChatBubble message={message} />;
-
     default:
       break;
   }

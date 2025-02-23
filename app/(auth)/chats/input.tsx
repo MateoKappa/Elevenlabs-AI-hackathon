@@ -1,5 +1,4 @@
-import { Mic, Paperclip, PlusCircleIcon, SmileIcon } from "lucide-react";
-import {} from "lucide-react";
+import { PlusCircleIcon } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
@@ -9,16 +8,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { ChatMessageProps } from "@/types";
 import ShortUniqueId from "short-unique-id";
 import type { Tables } from "@/db/database.types";
 import { fal } from "@fal-ai/client";
 import { useRef, useEffect } from "react";
-import { Enums } from "@/db/database.types";
+import type { Enums } from "@/db/database.types";
+import { useState } from "react";
+
 fal.config({
   proxyUrl: "/api/fal",
 });
-import { useState } from "react";
 
 export default function ChatFooter({
   messages,
@@ -35,7 +34,9 @@ export default function ChatFooter({
     messagesRef.current = messages;
   }, [messages]);
 
-  const onSubmit = async () => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     const { randomUUID } = new ShortUniqueId({ length: 10 });
 
     const type: Enums<"MESSAGE_TYPE"> = "TEXT";
@@ -66,7 +67,6 @@ export default function ChatFooter({
     ];
 
     setMessages((prevMessages: Tables<"chat_history">[]) => {
-      console.log("Previous messages (initial submit):", prevMessages);
       return [...prevMessages, ...updatedMessages];
     });
 
