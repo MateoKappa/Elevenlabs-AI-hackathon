@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useState } from "react";
-import { ChatItemProps, SelectedChatContextType } from "@/types";
+import type { ChatItemProps } from "@/types";
 
 import { Search } from "lucide-react";
 import ChatListItem from "./chat-list-item";

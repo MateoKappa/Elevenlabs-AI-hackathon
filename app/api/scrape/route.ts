@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { generateObject, generateText } from "ai";
 import { mistral } from "@ai-sdk/mistral";
-import { ElevenLabsClient } from "elevenlabs";
 
 const firecrawl = new FireCrawl({
   apiKey: process.env.FIRECRAWL_API_KEY,

@@ -1,5 +1,5 @@
-import { AvatarIndicatorProps } from "@/components/ui/avatar";
-import { Dispatch, SetStateAction } from "react";
+import type { AvatarIndicatorProps } from "@/components/ui/avatar";
+import type { Dispatch, SetStateAction } from "react";
 
 export type ChatItemProps = {
   id: number;

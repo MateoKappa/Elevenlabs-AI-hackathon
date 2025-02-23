@@ -4,7 +4,7 @@ import { Inter, Bricolage_Grotesque } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { fal } from "@fal-ai/client";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Navbar } from "@/components/layout/navbar";
+import ReactQueryClientProvider from "@/components/query-client-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 const bricolageGrotesque = Bricolage_Grotesque({
@@ -30,14 +30,16 @@ export default function RootLayout({
           bricolageGrotesque.variable
         )}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <ReactQueryClientProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </ReactQueryClientProvider>
       </body>
     </html>
   );

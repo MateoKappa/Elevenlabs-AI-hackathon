@@ -1,8 +1,6 @@
 import {
   Mic,
   Paperclip,
-  PauseCircle,
-  PlayCircle,
   PlusCircleIcon,
   SmileIcon,
 } from "lucide-react";
@@ -19,11 +17,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChatMessageProps } from "@/types";
+import type { ChatMessageProps } from "@/types";
 import { fal } from "@fal-ai/client";
 
 fal.config({

@@ -1,21 +1,26 @@
-'use server'
+import { createClient } from "@/supabase/client";
 
-import { createClient } from "@/supabase/server";
-import { redirect } from "next/navigation";
+const getURL = () => {
+  let url =
+    process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
+    process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
+    'http://localhost:3000/'
+  // Make sure to include `https://` when not localhost.
+  url = url.startsWith('http') ? url : `https://${url}`
+  // Make sure to include a trailing `/`.
+  url = url.endsWith('/') ? url : `${url}/`
+  return url
+}
 
 export async function loginWithGithub() {
   const supabase = createClient();
 
-  const { data, error } = await (await supabase).auth.signInWithOAuth({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "github",
     options: {
-      redirectTo: "/api/auth/callback",
+      redirectTo: `${getURL()}/api/auth/callback`,
     },
   });
-
-  if (data.url) {
-    redirect(data.url); 
-  }
 
   return { data, error };
 }

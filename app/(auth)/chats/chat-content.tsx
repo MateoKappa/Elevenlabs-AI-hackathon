@@ -1,9 +1,9 @@
 "use client";
 
 import { useContext, useEffect, useRef, useState } from "react";
-import { ChatMessageProps, SelectedChatContextType } from "@/types";
+import type { ChatMessageProps, SelectedChatContextType } from "@/types";
 
-import ChatFooter from "./chat-footer";
+import Footer from "./footer";
 import ChatHeader from "./chat-header";
 import ChatBubble from "./chat-bubbles";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -78,7 +78,7 @@ export default function ChatContent() {
         </div>
       </ScrollArea>
 
-      <ChatFooter
+      <Footer
         messages={messages}
         setMessages={setMessages}
         setCurrentAudioPosition={setCurrentAudioPosition}
