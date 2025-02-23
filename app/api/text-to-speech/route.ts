@@ -3,6 +3,7 @@ import { ElevenLabsClient } from "elevenlabs";
 import { createClient } from "@/supabase/server";
 import ShortUniqueId from "short-unique-id";
 import { upsertChat } from "@/db/chat-history/actions";
+import { validateAndUpsertChatRow } from "@/server-actions/chats";
 
 const client = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
 
@@ -32,9 +33,13 @@ export async function POST(req: Request) {
     const { data, error } = await supabase
       .storage
       .from("audio")
-      .upload(`https://eppqzyovaadrohikesgh.supabase.co/storage/v1/object/public/${randomUUID()}.mp3`, audioBuffer);
+      .upload(`${randomUUID()}.mp3`, audioBuffer);
 
-    await upsertChat(roomUuid, content, data?.fullPath ?? null, null, chatId);
+    await validateAndUpsertChatRow(roomUuid, {
+      content,
+      audio: `https://eppqzyovaadrohikesgh.supabase.co/storage/v1/object/public/${data?.fullPath ?? null}`,
+      id: chatId,
+    });
 
     return new NextResponse(audioBuffer, {
       headers: { "Content-Type": "audio/mpeg" },

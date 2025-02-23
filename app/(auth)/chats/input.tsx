@@ -1,20 +1,13 @@
-import { PlusCircleIcon } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import ShortUniqueId from "short-unique-id";
 import type { Tables } from "@/db/database.types";
 import { fal } from "@fal-ai/client";
 import { useRef, useEffect } from "react";
 import type { Enums } from "@/db/database.types";
 import { useState } from "react";
-import { validateAndUpdateChatRow } from "@/server-actions/chats";
+import { validateAndUpdateChatRow, validateAndUpsertChatRow } from "@/server-actions/chats";
 
 fal.config({
   proxyUrl: "/api/fal",
@@ -40,6 +33,14 @@ export default function ChatInput({
     const { randomUUID } = new ShortUniqueId({ length: 10 });
 
     const type: Enums<"MESSAGE_TYPE"> = "TEXT";
+
+    await validateAndUpsertChatRow(roomId, {
+      content: inputValue,
+      state: "idle",
+      room_uuid: roomId,
+      own_message: true,
+      type: type,
+    });
 
     const updatedMessages = [
       {
