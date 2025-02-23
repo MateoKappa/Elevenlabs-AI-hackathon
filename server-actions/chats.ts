@@ -1,5 +1,6 @@
 "use server";
-import { Tables } from "@/db/database.types";
+
+import type { Tables } from "@/db/database.types";
 import { createClient } from "@/supabase/server";
 import { updateChat } from "@/db/chat-history/actions";
 import { getRoom } from "@/db/rooms/actions";

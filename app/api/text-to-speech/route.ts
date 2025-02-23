@@ -29,11 +29,10 @@ export async function POST(req: Request) {
     const { randomUUID } = new ShortUniqueId({ length: 10 });
 
     const supabase = await createClient();
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabase
+      .storage
       .from("audio")
-      .upload(`${randomUUID()}.mp3`, audioBuffer);
-
-    console.log("uploading audio", data?.fullPath, error);
+      .upload(`https://eppqzyovaadrohikesgh.supabase.co/storage/v1/object/public/${randomUUID()}.mp3`, audioBuffer);
 
     await upsertChat(roomUuid, content, data?.fullPath ?? null, null, chatId);
 
