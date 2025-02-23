@@ -10,13 +10,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { SelectedChatContext } from "@/components/contexts";
 import UserDetailSheet from "./user-detail-sheet";
 
-const test = [
-  { id: 1, content: "Hello", type: "text" },
-  { id: 2, content: "Hello", type: "text" },
-  { id: 3, content: "Hello", type: "text" },
-  { id: 4, content: "Hello", type: "text" },
-];
-
 export default function ChatContent() {
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const { selectedChat } = useContext(
@@ -24,7 +17,7 @@ export default function ChatContent() {
   ) as SelectedChatContextType;
 
   const [messages, setMessages] = useState<ChatMessageProps[]>(
-    selectedChat?.messages ?? test
+    selectedChat?.messages ?? []
   );
 
   // Add new state for tracking current audio position
@@ -34,7 +27,7 @@ export default function ChatContent() {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollIntoView(false);
     }
-    setMessages(selectedChat?.messages ?? test);
+    setMessages(selectedChat?.messages ?? []);
   }, [selectedChat]);
 
   if (!selectedChat) {
@@ -56,8 +49,6 @@ export default function ChatContent() {
 
   const chat = messages;
 
-  console.log(messages);
-
   return (
     <div className="flex flex-col z-50 inset-0 bg-background lg:bg-transparent fixed lg:relative p-4 lg:p-0">
       <ChatHeader user={selectedChat.user} />
@@ -71,7 +62,7 @@ export default function ChatContent() {
                 <ChatBubble
                   message={item}
                   type={item.type ?? "text"}
-                  key={item.id}
+                  key={item.id.toString()}
                 />
               ))}
           </div>

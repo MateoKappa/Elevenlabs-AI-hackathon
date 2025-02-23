@@ -23,7 +23,6 @@ export default function ChatListItem({
 
   const handleClick = (chat: ChatItemProps) => {
     setSelectedChat(chat);
-    console.log(chat, "chat");
   };
 
   const unreadMessageCount = chat?.messages?.filter((item) => !item.read) ?? [];

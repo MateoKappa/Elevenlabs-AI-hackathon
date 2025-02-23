@@ -1,9 +1,4 @@
-import {
-  Mic,
-  Paperclip,
-  PlusCircleIcon,
-  SmileIcon,
-} from "lucide-react";
+import { Mic, Paperclip, PlusCircleIcon, SmileIcon } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
@@ -21,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { ChatMessageProps } from "@/types";
+import ShortUniqueId from "short-unique-id";
 import { fal } from "@fal-ai/client";
 
 fal.config({
@@ -35,26 +31,29 @@ export default function ChatFooter({
   setCurrentAudioPosition,
 }: {
   messages: ChatMessageProps[];
-  setMessages: (messages: ChatMessageProps[]) => void;
+  setMessages: React.Dispatch<React.SetStateAction<ChatMessageProps[]>>;
   setCurrentAudioPosition: (position: number) => void;
 }) {
   const [inputValue, setInputValue] = useState("");
-  const [audioUrl, setAudioUrl] = useState("");
   const [videoUrl, setVideoUrl] = useState<string>("");
+  const messagesRef = useRef(messages);
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   const onSubmit = async () => {
-    const newMessageId =
-      messages.length > 0 ? messages[messages.length - 1].id + 1 : 1;
+    const { randomUUID } = new ShortUniqueId({ length: 10 });
+
     const updatedMessages = [
-      ...messages,
       {
-        id: newMessageId,
+        id: randomUUID(),
         content: inputValue,
         type: "text",
         own_message: true,
       } as ChatMessageProps,
       {
-        id: newMessageId + 1,
+        id: randomUUID(),
         content: "",
         type: "text",
         own_message: false,
@@ -62,7 +61,10 @@ export default function ChatFooter({
       } as ChatMessageProps,
     ];
 
-    setMessages(updatedMessages);
+    setMessages((prevMessages: ChatMessageProps[]) => {
+      console.log("Previous messages (initial submit):", prevMessages);
+      return [...prevMessages, ...updatedMessages];
+    });
 
     setInputValue("");
     const scrapeResponse = await fetch("/api/scrape", {
@@ -79,13 +81,15 @@ export default function ChatFooter({
 
     const { text, video_prompt } = await scrapeResponse.json();
 
-    setMessages([
-      ...updatedMessages.slice(0, -1),
-      {
-        ...updatedMessages[updatedMessages.length - 1],
+    setMessages((prevMessages: ChatMessageProps[]) => {
+      console.log("Previous messages (creating_audio):", prevMessages);
+      const newMessages = [...prevMessages];
+      newMessages[newMessages.length - 1] = {
+        ...newMessages[newMessages.length - 1],
         state: "creating_audio",
-      },
-    ]);
+      };
+      return newMessages;
+    });
 
     const [audioBuffer, videoResult] = await Promise.all([
       // Text to speech request
@@ -99,17 +103,19 @@ export default function ChatFooter({
         .then((res) => res.arrayBuffer())
         .then((buffer) => {
           const audioUrl = URL.createObjectURL(new Blob([buffer]));
-          setAudioUrl(audioUrl);
 
-          setMessages([
-            ...updatedMessages.slice(0, -1),
-            {
-              ...updatedMessages[updatedMessages.length - 1],
+          setMessages((prevMessages: ChatMessageProps[]) => {
+            console.log("Previous messages (creating_video):", prevMessages);
+            const newMessages = [...prevMessages];
+            newMessages[newMessages.length - 1] = {
+              ...newMessages[newMessages.length - 1],
               content: text,
               audio: audioUrl,
               state: "creating_video",
-            },
-          ]);
+            };
+            console.log("New messages (creating_video):", newMessages);
+            return newMessages;
+          });
 
           return audioUrl;
         }),
@@ -122,23 +128,25 @@ export default function ChatFooter({
           },
           logs: true,
           onQueueUpdate: (update) => {
-            console.log(update);
+            // console.log(update);
           },
         });
       })(),
     ]);
 
-    setVideoUrl(videoResult.data.video.url);
-    setMessages([
-      ...updatedMessages.slice(0, -1),
-      {
-        ...updatedMessages[updatedMessages.length - 1],
+    setMessages((prevMessages: ChatMessageProps[]) => {
+      console.log("Previous messages (final state):", prevMessages);
+      const newMessages = [...prevMessages];
+      newMessages[newMessages.length - 1] = {
+        ...newMessages[newMessages.length - 1],
         content: text,
-        audio: audioUrl,
         video: videoResult.data.video.url,
         state: "idle",
-      } as ChatMessageProps,
-    ]);
+      };
+      return newMessages;
+    });
+
+    setVideoUrl(videoResult.data.video.url);
   };
 
   return (

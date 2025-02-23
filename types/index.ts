@@ -1,5 +1,6 @@
 import type { AvatarIndicatorProps } from "@/components/ui/avatar";
 import type { Dispatch, SetStateAction } from "react";
+import type ShortUniqueId from "short-unique-id";
 
 export type ChatItemProps = {
   id: number;
@@ -14,8 +15,15 @@ export type ChatItemProps = {
   user: UserPropsTypes;
 };
 
+export type ChatMessageState =
+  | "creating_text"
+  | "creating_audio"
+  | "creating_video"
+  | "idle"
+  | "error";
+
 export type ChatMessageProps = {
-  id: number;
+  id: string;
   content?: string;
   type?: string;
   own_message?: boolean;
@@ -23,7 +31,7 @@ export type ChatMessageProps = {
   data?: ChatMessageDataProps;
   audio?: string;
   video?: string;
-  state?: "creating_text" | "creating_audio" | "creating_video" | "idle";
+  state?: ChatMessageState;
 };
 
 export type ChatMessageDataProps = {
