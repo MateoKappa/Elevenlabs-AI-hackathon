@@ -4,81 +4,31 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PauseCircle, PlayCircle } from "lucide-react";
 import MessageStatusIcon from "./message-status-icon";
 import { useWavesurfer } from "@wavesurfer/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useCallback } from "react";
 import type { Tables } from "@/db/database.types";
+import AudioBubble from "./audio-bubble";
+import StreamingText from "./streaming-text";
 
 function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const [localAudioPosition, setLocalAudioPosition] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
 
+  const memoizedSetIsFinished = useCallback((value: boolean) => {
+    setIsFinished(value);
+  }, []);
+
+  const memoizedSetLocalAudioPosition = useCallback((value: number) => {
+    setLocalAudioPosition(value);
+  }, []);
+
   console.log("message", message);
-
-  const { wavesurfer, isPlaying } = useWavesurfer({
-    container: containerRef,
-    height: 44,
-    barGap: 2,
-    barRadius: 4,
-    barWidth: 3,
-    barHeight: 1,
-    waveColor: "#d1a0b5",
-    progressColor: "#a3426c",
-    cursorWidth: 0,
-    interact: true,
-    fillParent: true,
-    hideScrollbar: true,
-    url: message.audio ?? undefined,
-  });
-
-  const playPause = useCallback(() => {
-    if (!wavesurfer) return;
-    if (isPlaying) wavesurfer.pause();
-    else wavesurfer.play();
-  }, [isPlaying, wavesurfer]);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    if (!wavesurfer) return;
-
-    wavesurfer.on("interaction", () => {
-      wavesurfer.play();
-      setIsFinished(false);
-    });
-
-    wavesurfer.on("audioprocess", () => {
-      setLocalAudioPosition(wavesurfer.getCurrentTime());
-    });
-
-    wavesurfer.on("finish", () => {
-      wavesurfer.stop();
-      setIsFinished(true);
-    });
-
-    // Auto-play when ready
-    wavesurfer.on("ready", () => {
-      wavesurfer.play();
-    });
-  }, [wavesurfer]);
-
-  const CHARS_PER_SECOND = 14.5;
-
-  const renderStreamingText = (text: string) => {
-    if (isFinished) return <span className="whitespace-pre-wrap">{text}</span>;
-
-    const currentPosition = Math.floor(localAudioPosition * CHARS_PER_SECOND);
-    return (
-      <span className="whitespace-pre-wrap">
-        {text.slice(0, currentPosition)}
-      </span>
-    );
-  };
 
   const isLoading =
     message.state === "creating_text" || message.state === "creating_audio";
 
   const isCreatingVideo = message.state === "creating_video";
-  const videoCreated = message.state === "idle" && message.video;
+  const videoCreated = message.video;
 
   return (
     <div
@@ -131,34 +81,15 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
                   </div>
                 </div>
               ) : (
-                <>
-                  {message.own_message || !message.audio
-                    ? message.content
-                    : renderStreamingText(message.content ?? "")}
-                </>
+                <StreamingText ownMessage={message.own_message} audioUrl={message.audio} content={message.content} isFinished={isFinished} localAudioPosition={localAudioPosition} />
               )}
-              {message.audio && (
-                <div className="mt-3 flex flex-row items-center gap-1 rounded-full border border-bright-plum-50 min-w-[550px] bg-bright-plum-7 px-3 py-1 text-sm">
-                  {isLoading ? (
-                    <div className="w-full h-11 bg-bright-plum-50/20 rounded-full animate-pulse" />
-                  ) : (
-                    <>
-                      <button
-                        className="shrink-0 text-bright-plum"
-                        type="button"
-                        onClick={playPause}
-                      >
-                        {isPlaying ? (
-                          <PauseCircle size={32} />
-                        ) : (
-                          <PlayCircle size={32} />
-                        )}
-                      </button>
-                      <div className="ml-1 h-full w-full" ref={containerRef} />
-                    </>
-                  )}
-                </div>
-              )}
+
+              {message.audio && <AudioBubble
+                setIsFinished={memoizedSetIsFinished}
+                setLocalAudioPosition={memoizedSetLocalAudioPosition}
+                audioUrl={message.audio}
+                isLoading={isLoading}
+              />}
             </CardContent>
           </Card>
         </div>
@@ -176,7 +107,6 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
         >
           05:23 PM
         </time>
-        {message.own_message && <MessageStatusIcon status="read" />}
       </div>
     </div>
   );
