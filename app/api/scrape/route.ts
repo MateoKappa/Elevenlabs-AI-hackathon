@@ -25,8 +25,8 @@ export async function POST(req: Request) {
 
     if (image) {
       const {
-        object: { story, videoPrompt, success },
-      } = await generateStoryAndVideoPrompt(image);
+        object: { story, videoPrompt },
+      } = await generateStoryAndVideoPrompt(image, userMessage);
 
       const chat = await validateAndUpsertChatRow(roomUuid, {
         content: story,
@@ -172,13 +172,12 @@ export async function POST(req: Request) {
   }
 }
 
-async function generateStoryAndVideoPrompt(image: string) {
+async function generateStoryAndVideoPrompt(image: string, input?: string) {
   return await generateObject({
     model: openai("gpt-4o"),
     schema: z.object({
       story: z.string(),
       videoPrompt: z.string(),
-      success: z.boolean(),
     }),
     messages: [
       {
@@ -186,7 +185,7 @@ async function generateStoryAndVideoPrompt(image: string) {
         content: [
           {
             type: "text",
-            text: "Create a story and a video prompt for this image.",
+            text: `Create a story and a video prompt for this image. ${input}`,
           },
           {
             type: "image",
