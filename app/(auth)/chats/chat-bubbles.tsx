@@ -65,10 +65,10 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
                 message.own_message,
             })}
           >
-            <CardContent className="p-4 flex flex-col gap-2">
+            <CardContent className="p-4 flex flex-col gap-2 w-full">
               {videoCreated && message.video && (
                 <video
-                  className="rounded-lg w-full max-w-[550px]"
+                  className="rounded-lg aspect-video"
                   controls
                   src={message.video}
                   loop

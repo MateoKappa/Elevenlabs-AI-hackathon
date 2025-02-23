@@ -8,6 +8,7 @@ import ChatBubble from "./chat-bubbles";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SelectedChatContext } from "@/components/contexts";
 import type { Tables } from "@/db/database.types";
+import ChatHeader from "./header";
 
 export default function ChatContent() {
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
@@ -47,6 +48,8 @@ export default function ChatContent() {
 
   return (
     <div className="h-full flex justify-between flex-col z-50 inset-0 bg-background lg:bg-transparent fixed lg:relative p-4 lg:p-0">
+      <ChatHeader user={selectedChat.user} />
+
       <ScrollArea className="w-full h-screen py-4 relative">
         <div className="flex flex-col items-start py-8 space-y-10 ">
           {chat &&

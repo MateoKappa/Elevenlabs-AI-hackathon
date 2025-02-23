@@ -1,9 +1,9 @@
 import { useWavesurfer } from "@wavesurfer/react";
+import { memo } from "react";
 import { PauseCircle, PlayCircle } from "lucide-react";
 import {
-  Dispatch,
-  memo,
-  SetStateAction,
+  type Dispatch,
+  type SetStateAction,
   useCallback,
   useEffect,
   useRef,
@@ -99,7 +99,14 @@ const AudioBubble = memo(
         wavesurfer.un("audioprocess", handleAudioProcess);
         wavesurfer.un("finish", handleFinish);
       };
-    }, [wavesurfer, setIsFinished, setLocalAudioPosition, isDestroyed]);
+    }, [
+      wavesurfer,
+      setIsFinished,
+      setLocalAudioPosition,
+      isDestroyed,
+      showedMessage,
+      state,
+    ]);
 
     return (
       <div className="flex flex-row items-center gap-1 rounded-xl border-b min-w-[550px] px-3 py-1 text-sm">

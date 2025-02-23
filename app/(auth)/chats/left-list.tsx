@@ -41,25 +41,24 @@ export default function ChatList({ rooms }: { rooms: ChatRoomProps[] }) {
           onChange={changeHandle}
         />
       </div>
-      <div className="h-full flex lg:pt-4">
-        <ScrollArea className="w-full min-w-0">
-          <div className="block divide-y min-w-0">
-            {filteredChats.length ? (
-              filteredChats.map((room) => (
-                <ChatListItem
-                  room={room}
-                  key={room.id}
-                  active={selectedChat && selectedChat.id === room.id}
-                />
-              ))
-            ) : (
-              <div className="text-center text-muted-foreground text-sm mt-4">
-                No chat found
-              </div>
-            )}
-          </div>
-        </ScrollArea>
-      </div>
+
+      <ScrollArea className="h-[calc(100vh-200px)]">
+        <div className="relative divide-y">
+          {filteredChats.length ? (
+            filteredChats.map((room) => (
+              <ChatListItem
+                room={room}
+                key={room.id}
+                active={selectedChat && selectedChat.id === room.id}
+              />
+            ))
+          ) : (
+            <div className="text-center text-muted-foreground text-sm mt-4">
+              No chats found
+            </div>
+          )}
+        </div>
+      </ScrollArea>
     </>
   );
 }
