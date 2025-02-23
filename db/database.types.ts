@@ -11,22 +11,37 @@ export type Database = {
     Tables: {
       chat_history: {
         Row: {
+          audio: string | null
           content: string | null
           created_at: string
           id: number
+          own_message: boolean
           room_uuid: string
+          state: string | null
+          type: Database["public"]["Enums"]["MESSAGE_TYPE"]
+          video: string | null
         }
         Insert: {
+          audio?: string | null
           content?: string | null
           created_at?: string
           id?: number
+          own_message?: boolean
           room_uuid: string
+          state?: string | null
+          type?: Database["public"]["Enums"]["MESSAGE_TYPE"]
+          video?: string | null
         }
         Update: {
+          audio?: string | null
           content?: string | null
           created_at?: string
           id?: number
+          own_message?: boolean
           room_uuid?: string
+          state?: string | null
+          type?: Database["public"]["Enums"]["MESSAGE_TYPE"]
+          video?: string | null
         }
         Relationships: [
           {
@@ -42,19 +57,19 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          name: string | null
+          name: string
           user_uuid: string
         }
         Insert: {
           created_at?: string
           id?: string
-          name?: string | null
+          name: string
           user_uuid: string
         }
         Update: {
           created_at?: string
           id?: string
-          name?: string | null
+          name?: string
           user_uuid?: string
         }
         Relationships: []

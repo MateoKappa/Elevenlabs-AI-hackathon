@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React, { useContext } from "react";
-import { UserProfileContextType, UserPropsTypes } from "@/types";
+import type { UserProfileContextType, UserPropsTypes } from "@/types";
 import { generateAvatarFallback } from "@/lib/generate-avatar-fallback";
 
 import {
@@ -45,16 +45,6 @@ export default function UserDetailSheet({ user }: { user: UserPropsTypes }) {
                   fallback={generateAvatarFallback(user.name)}
                 />
                 <h4 className="text-xl font-bold mb-2">{user.name}</h4>
-                <div className="text-sm">
-                  Last seen:{" "}
-                  {user.online_status == "success" ? (
-                    <span className="text-green-500">Online</span>
-                  ) : (
-                    <span className="text-muted-foreground">
-                      {user.last_seen}
-                    </span>
-                  )}
-                </div>
               </div>
               <div className="divide-y space-y-2">
                 {user.about && (

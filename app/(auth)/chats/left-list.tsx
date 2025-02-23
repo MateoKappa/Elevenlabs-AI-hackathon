@@ -1,34 +1,34 @@
 "use client";
 
 import { useContext, useState } from "react";
-import type { ChatItemProps } from "@/types";
 
 import { Search } from "lucide-react";
-import ChatListItem from "./chat-list-item";
+import ChatListItem from "./list-item";
 import { SelectedChatContext } from "@/components/contexts";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect } from "react";
+import type { ChatRoomProps } from "@/types";
 
-export default function ChatList({ chats }: { chats: ChatItemProps[] }) {
+export default function ChatList({ rooms }: { rooms: ChatRoomProps[] }) {
   const context = useContext(SelectedChatContext);
   const { selectedChat, setSelectedChat } = context || { selectedChat: null };
-  const [filteredChats, setFilteredChats] = useState(chats);
+  const [filteredChats, setFilteredChats] = useState(rooms);
 
   const changeHandle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = e.target.value.trim();
 
-    const filteredItems = chats.filter((chat) =>
-      chat.user.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredItems = rooms.filter((room) =>
+      room.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredChats(filteredItems);
   };
 
   useEffect(() => {
-    if (chats.length > 0 && setSelectedChat) {
-      setSelectedChat(chats[0]);
+    if (rooms.length > 0 && setSelectedChat) {
+      setSelectedChat(rooms[0]);
     }
-  }, [chats, setSelectedChat]);
+  }, [rooms, setSelectedChat]);
 
   return (
     <>
@@ -45,11 +45,11 @@ export default function ChatList({ chats }: { chats: ChatItemProps[] }) {
         <ScrollArea className="w-full min-w-0">
           <div className="block divide-y min-w-0">
             {filteredChats.length ? (
-              filteredChats.map((chat) => (
+              filteredChats.map((room) => (
                 <ChatListItem
-                  chat={chat}
-                  key={chat.id}
-                  active={selectedChat && selectedChat.id === chat.id}
+                  room={room}
+                  key={room.id}
+                  active={selectedChat && selectedChat.id === room.id}
                 />
               ))
             ) : (

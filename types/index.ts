@@ -1,13 +1,22 @@
 import type { AvatarIndicatorProps } from "@/components/ui/avatar";
+import type { Database, Tables } from "@/db/database.types";
 import type { Dispatch, SetStateAction } from "react";
+
+export type ChatRoomProps = {
+  last_message?: Tables<"chat_history">;
+  messages?: Tables<"chat_history">[];
+  user: {
+    id: string;
+    name: string;
+    avatar: string;
+  }
+} & Tables<"rooms">
 
 export type ChatItemProps = {
   id: number;
   name?: string;
   image?: string;
   date?: string;
-  status?: "sent" | "forwarded" | "read";
-  is_archive?: boolean;
   last_message?: string;
   messages?: ChatMessageProps[];
   user_id: number;
@@ -19,7 +28,6 @@ export type ChatMessageProps = {
   content?: string;
   type?: string;
   own_message?: boolean;
-  read?: boolean;
   data?: ChatMessageDataProps;
   audio?: string;
   video?: string;
@@ -63,8 +71,8 @@ export interface UserProfileContextType {
 }
 
 export interface SelectedChatContextType {
-  selectedChat: ChatItemProps | null;
-  setSelectedChat: Dispatch<SetStateAction<ChatItemProps | null>>;
+  selectedChat: ChatRoomProps | null;
+  setSelectedChat: Dispatch<SetStateAction<ChatRoomProps | null>>;
 }
 
 export interface SelectedContactContextType {

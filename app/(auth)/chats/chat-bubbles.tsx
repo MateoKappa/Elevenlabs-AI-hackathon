@@ -1,7 +1,6 @@
-import { ChatMessageProps } from "@/types";
 import { cn } from "@/lib/utils";
 
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,14 +20,15 @@ import MessageStatusIcon from "./message-status-icon";
 import { useWavesurfer } from "@wavesurfer/react";
 import { useEffect, useRef, useState } from "react";
 import { useCallback } from "react";
+import type { Tables } from "@/db/database.types";
 
 interface ChatBubbleProps {
-  message: ChatMessageProps;
+  message: Tables<"chat_history">;
   type: string;
   audio?: string;
 }
 
-function TextChatBubble({ message }: { message: ChatMessageProps }) {
+function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [localAudioPosition, setLocalAudioPosition] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
@@ -46,13 +46,11 @@ function TextChatBubble({ message }: { message: ChatMessageProps }) {
     interact: true,
     fillParent: true,
     hideScrollbar: true,
-    url: message.audio,
+    url: message.audio ?? undefined,
   });
 
   const playPause = useCallback(() => {
     if (!wavesurfer) return;
-
-    console.log("isPlaying", isPlaying);
     if (isPlaying) wavesurfer.pause();
     else wavesurfer.play();
   }, [isPlaying, wavesurfer]);
@@ -125,11 +123,14 @@ function TextChatBubble({ message }: { message: ChatMessageProps }) {
           {videoCreated && (
             <Card className="w-full">
               <CardContent className="p-4 ">
-                <video
-                  className="rounded-lg w-full max-w-[550px]"
-                  controls
-                  src={message.video}
-                />
+                {message.video &&
+                  <video
+                    className="rounded-lg w-full max-w-[550px]"
+                    controls
+                    src={message.video}
+                  >
+                    <track kind="captions" />
+                  </video>}
               </CardContent>
             </Card>
           )}
@@ -177,25 +178,6 @@ function TextChatBubble({ message }: { message: ChatMessageProps }) {
               )}
             </CardContent>
           </Card>
-        </div>
-        <div className={cn({ "order-2": !message.own_message })}>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost">
-                <Ellipsis className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-40">
-              <DropdownMenuGroup>
-                <DropdownMenuItem>Forward</DropdownMenuItem>
-                <DropdownMenuItem>Star</DropdownMenuItem>
-                {message.own_message && (
-                  <DropdownMenuItem>Edit</DropdownMenuItem>
-                )}
-                <DropdownMenuItem>Delete</DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
       <div

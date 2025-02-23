@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { UserAvatarProps } from "@/types";
+import type { UserAvatarProps } from "@/types";
 
 import {
   Avatar,

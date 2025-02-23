@@ -1,42 +1,29 @@
 import {
-  Mic,
-  Paperclip,
   PlusCircleIcon,
-  SmileIcon,
 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../../../components/ui/tooltip";
-import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { ChatMessageProps } from "@/types";
+import type { Tables } from "@/db/database.types";
 import { fal } from "@fal-ai/client";
 
 fal.config({
   proxyUrl: "/api/fal",
 });
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useWavesurfer } from "@wavesurfer/react";
+import { useState } from "react";
 
 export default function ChatFooter({
   messages,
   setMessages,
-  setCurrentAudioPosition,
 }: {
-  messages: ChatMessageProps[];
-  setMessages: (messages: ChatMessageProps[]) => void;
-  setCurrentAudioPosition: (position: number) => void;
+  messages: Tables<"chat_history">[];
+  setMessages: (messages: Tables<"chat_history">[]) => void;
 }) {
   const [inputValue, setInputValue] = useState("");
   const [audioUrl, setAudioUrl] = useState("");
@@ -52,14 +39,23 @@ export default function ChatFooter({
         content: inputValue,
         type: "text",
         own_message: true,
-      } as ChatMessageProps,
+        audio: null,
+        video: null,
+        state: null,
+        created_at: new Date().toISOString(),
+        room_uuid: messages[0]?.room_uuid ?? "",
+      } as Tables<"chat_history">,
       {
         id: newMessageId + 1,
         content: "",
         type: "text",
         own_message: false,
+        audio: null,
+        video: null,
         state: "creating_text" as const,
-      } as ChatMessageProps,
+        created_at: new Date().toISOString(),
+        room_uuid: messages[0]?.room_uuid ?? "",
+      } as Tables<"chat_history">,
     ];
 
     setMessages(updatedMessages);
@@ -84,7 +80,7 @@ export default function ChatFooter({
       {
         ...updatedMessages[updatedMessages.length - 1],
         state: "creating_audio",
-      },
+      } as Tables<"chat_history">,
     ]);
 
     const [audioBuffer, videoResult] = await Promise.all([
@@ -108,7 +104,7 @@ export default function ChatFooter({
               content: text,
               audio: audioUrl,
               state: "creating_video",
-            },
+            } as Tables<"chat_history">,
           ]);
 
           return audioUrl;
@@ -137,12 +133,12 @@ export default function ChatFooter({
         audio: audioUrl,
         video: videoResult.data.video.url,
         state: "idle",
-      } as ChatMessageProps,
+      } as Tables<"chat_history">,
     ]);
   };
 
   return (
-    <>
+    <form onSubmit={onSubmit}>
       <Card>
         <CardContent className="p-2 lg:p-4 flex items-center relative">
           <Input
@@ -165,55 +161,15 @@ export default function ChatFooter({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Emoji</DropdownMenuItem>
-                  <DropdownMenuItem>Add File</DropdownMenuItem>
-                  <DropdownMenuItem>Send Voice</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <div className="hidden lg:block">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="p-0 w-11 h-11 rounded-full"
-                    >
-                      <SmileIcon className="w-4 h-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Emoji</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="p-0 w-11 h-11 rounded-full"
-                    >
-                      <Paperclip className="w-4 h-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Select File</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="p-0 w-11 h-11 rounded-full"
-                    >
-                      <Mic className="w-4 h-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Send Voice</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            <Button onClick={onSubmit} variant="outline" className="ms-3">
+            <Button type="submit" variant="outline" className="ms-3">
               Send
             </Button>
           </div>
         </CardContent>
       </Card>
-    </>
+    </form>
   );
 }

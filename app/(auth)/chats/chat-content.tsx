@@ -1,21 +1,13 @@
 "use client";
 
 import { useContext, useEffect, useRef, useState } from "react";
-import type { ChatMessageProps, SelectedChatContextType } from "@/types";
+import type { ChatMessageProps, ChatRoomProps, SelectedChatContextType } from "@/types";
 
-import Footer from "./footer";
-import ChatHeader from "./chat-header";
+import Input from "./input";
 import ChatBubble from "./chat-bubbles";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SelectedChatContext } from "@/components/contexts";
 import UserDetailSheet from "./user-detail-sheet";
-
-const test = [
-  { id: 1, content: "Hello", type: "text" },
-  { id: 2, content: "Hello", type: "text" },
-  { id: 3, content: "Hello", type: "text" },
-  { id: 4, content: "Hello", type: "text" },
-];
 
 export default function ChatContent() {
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
@@ -23,8 +15,8 @@ export default function ChatContent() {
     SelectedChatContext
   ) as SelectedChatContextType;
 
-  const [messages, setMessages] = useState<ChatMessageProps[]>(
-    selectedChat?.messages ?? test
+  const [messages, setMessages] = useState<ChatRoomProps['messages']>(
+    selectedChat?.messages
   );
 
   // Add new state for tracking current audio position
@@ -34,7 +26,7 @@ export default function ChatContent() {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollIntoView(false);
     }
-    setMessages(selectedChat?.messages ?? test);
+    setMessages(selectedChat?.messages);
   }, [selectedChat]);
 
   if (!selectedChat) {
@@ -56,12 +48,8 @@ export default function ChatContent() {
 
   const chat = messages;
 
-  console.log(messages);
-
   return (
     <div className="flex flex-col z-50 inset-0 bg-background lg:bg-transparent fixed lg:relative p-4 lg:p-0">
-      <ChatHeader user={selectedChat.user} />
-
       <ScrollArea className="w-full h-screen lg:h-[calc(100vh_-_13.8rem)] py-4 relative">
         <div ref={messagesContainerRef}>
           <div className="flex flex-col items-start py-8 space-y-10 ">
@@ -78,10 +66,9 @@ export default function ChatContent() {
         </div>
       </ScrollArea>
 
-      <Footer
+      <Input
         messages={messages}
         setMessages={setMessages}
-        setCurrentAudioPosition={setCurrentAudioPosition}
       />
 
       <UserDetailSheet user={selectedChat.user} />
