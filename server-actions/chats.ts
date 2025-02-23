@@ -2,6 +2,7 @@
 import { Tables } from "@/db/database.types";
 import { createClient } from "@/supabase/server";
 import { updateChat } from "@/db/chat-history/actions";
+import { getRoom } from "@/db/rooms/actions";
 
 export async function getChats() {
   try {
@@ -49,7 +50,7 @@ export async function getChats() {
 }
 
 export async function validateAndUpdateChatRow(
-  chatId: string,
+  roomId: string,
   updates: Partial<Tables<"chat_history">>
 ) {
   try {
@@ -61,8 +62,11 @@ export async function validateAndUpdateChatRow(
 
     if (!user) throw new Error("User not found");
 
-    // Update the chat with the provided updates
-    const error = await updateChat(chatId, updates, user);
+    const room = await getRoom(roomId);
+
+    if (!room) throw new Error("Room not found");
+
+    const error = await updateChat(updates);
 
     if (error) throw new Error("Error updating chat");
 

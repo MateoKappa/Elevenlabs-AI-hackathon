@@ -33,18 +33,15 @@ export async function upsertChat(
   }
 }
 
-export async function updateChat(
-  chatId: string,
-  updates: Partial<Tables<"chat_history">>,
-  user: User
-) {
+export async function updateChat(updates: Partial<Tables<"chat_history">>) {
+  if (!updates.id) throw new Error("Chat ID is required");
+
   const supabase = await createClient();
 
   const { error } = await supabase
     .from("chat_history")
     .update(updates)
-    .eq("id", chatId)
-    .eq("room.user_uuid", user.id)
+    .eq("id", updates.id)
     .throwOnError();
 
   return error;

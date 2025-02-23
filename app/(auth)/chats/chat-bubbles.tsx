@@ -1,26 +1,19 @@
 import { cn } from "@/lib/utils";
 
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  PauseCircle,
-  PlayCircle,
-} from "lucide-react";
+import { PauseCircle, PlayCircle } from "lucide-react";
 import MessageStatusIcon from "./message-status-icon";
 import { useWavesurfer } from "@wavesurfer/react";
 import { useEffect, useRef, useState } from "react";
 import { useCallback } from "react";
 import type { Tables } from "@/db/database.types";
 
-interface ChatBubbleProps {
-  message: Tables<"chat_history">;
-  type: string;
-  audio?: string;
-}
-
 function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [localAudioPosition, setLocalAudioPosition] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+
+  console.log("message", message);
 
   const { wavesurfer, isPlaying } = useWavesurfer({
     container: containerRef,
@@ -189,6 +182,11 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
   );
 }
 
+interface ChatBubbleProps {
+  message: Tables<"chat_history">;
+  type: string;
+  audio?: string;
+}
 export default function ChatBubble({ message, type, audio }: ChatBubbleProps) {
   switch (type) {
     case "TEXT":

@@ -33,6 +33,8 @@ export async function POST(req: Request) {
       .from("audio")
       .upload(`${randomUUID()}.mp3`, audioBuffer);
 
+    console.log("uploading audio", data?.fullPath, error);
+
     await upsertChat(roomUuid, content, data?.fullPath ?? null, null, chatId);
 
     return new NextResponse(audioBuffer, {

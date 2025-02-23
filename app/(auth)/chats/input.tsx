@@ -14,17 +14,20 @@ import { fal } from "@fal-ai/client";
 import { useRef, useEffect } from "react";
 import type { Enums } from "@/db/database.types";
 import { useState } from "react";
+import { validateAndUpdateChatRow } from "@/server-actions/chats";
 
 fal.config({
   proxyUrl: "/api/fal",
 });
 
-export default function ChatFooter({
+export default function ChatInput({
   messages,
+  roomId,
   setMessages,
 }: {
   setMessages: React.Dispatch<React.SetStateAction<Tables<"chat_history">[]>>;
   messages: Tables<"chat_history">[];
+  roomId: string;
 }) {
   const [inputValue, setInputValue] = useState("");
   const messagesRef = useRef(messages);
@@ -48,7 +51,7 @@ export default function ChatFooter({
         video: null,
         state: null,
         created_at: new Date().toISOString(),
-        room_uuid: messages[0]?.room_uuid ?? "",
+        room_uuid: roomId,
       },
       {
         id: randomUUID(),
@@ -59,7 +62,7 @@ export default function ChatFooter({
         video: null,
         state: "creating_text" as const,
         created_at: new Date().toISOString(),
-        room_uuid: messages[0]?.room_uuid ?? "",
+        room_uuid: roomId,
       },
     ];
 
@@ -75,7 +78,7 @@ export default function ChatFooter({
       },
       body: JSON.stringify({
         userMessage: inputValue,
-        roomUuid: messages[0]?.room_uuid,
+        roomUuid: roomId,
       }),
     });
 
@@ -102,7 +105,7 @@ export default function ChatFooter({
         },
         body: JSON.stringify({
           content: text,
-          roomUuid: messages[0]?.room_uuid,
+          roomUuid: roomId,
           chatId: chat_id,
         }),
       })
@@ -148,6 +151,10 @@ export default function ChatFooter({
         state: "idle",
       };
       return newMessages;
+    });
+    validateAndUpdateChatRow(roomId, {
+      video: videoResult.data.video.url,
+      id: chat_id,
     });
   };
 

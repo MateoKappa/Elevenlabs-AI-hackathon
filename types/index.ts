@@ -1,7 +1,6 @@
 import type { AvatarIndicatorProps } from "@/components/ui/avatar";
-import type { Database, Tables } from "@/db/database.types";
+import type { Tables } from "@/db/database.types";
 import type { Dispatch, SetStateAction } from "react";
-import type ShortUniqueId from "short-unique-id";
 
 export type ChatRoomProps = {
   last_message?: Tables<"chat_history">;
@@ -10,8 +9,8 @@ export type ChatRoomProps = {
     id: string;
     name: string;
     avatar: string;
-  }
-} & Tables<"rooms">
+  };
+} & Tables<"rooms">;
 
 export type ChatItemProps = {
   id: number;

@@ -1,9 +1,7 @@
 "use client";
 
 import { useContext, useEffect, useRef, useState } from "react";
-import type {
-  SelectedChatContextType,
-} from "@/types";
+import type { SelectedChatContextType } from "@/types";
 
 import Input from "./input";
 import ChatBubble from "./chat-bubbles";
@@ -16,6 +14,8 @@ export default function ChatContent() {
   const { selectedChat } = useContext(
     SelectedChatContext
   ) as SelectedChatContextType;
+
+  const roomId = selectedChat?.id;
 
   const [messages, setMessages] = useState<Tables<"chat_history">[]>(
     selectedChat?.messages ?? []
@@ -65,7 +65,11 @@ export default function ChatContent() {
         </div>
       </ScrollArea>
 
-      <Input messages={messages} setMessages={setMessages} />
+      <Input
+        messages={messages}
+        setMessages={setMessages}
+        roomId={roomId ?? ""}
+      />
 
       {/* <UserDetailSheet user={selectedChat.user} /> */}
     </div>

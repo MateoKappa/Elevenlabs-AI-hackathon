@@ -8,11 +8,16 @@ import {
   SelectedContactContext,
   SelectedStatusContext,
 } from "./contexts";
-import { ChatItemProps, StatusItemProps, UserPropsTypes } from "@/types";
+import {
+  ChatItemProps,
+  ChatRoomProps,
+  StatusItemProps,
+  UserPropsTypes,
+} from "@/types";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [show, setShow] = useState(false);
-  const [selectedChat, setSelectedChat] = useState<ChatItemProps | null>(null);
+  const [selectedChat, setSelectedChat] = useState<ChatRoomProps | null>(null);
   const [selectedContact, setSelectedContact] = useState<UserPropsTypes | null>(
     null
   );

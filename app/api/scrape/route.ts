@@ -21,6 +21,7 @@ export async function POST(req: Request) {
   try {
     const { userMessage, roomUuid } = await req.json();
 
+    console.log("checking user input");
     const {
       object: {
         actions: { instructions, url, message, success },
@@ -65,6 +66,7 @@ export async function POST(req: Request) {
       });
     }
 
+    console.log("scraping url");
     const scrapeResult = await firecrawl.extract([url], {
       prompt: `Extract specific content from the page based on these instructions:
         ${instructions}
@@ -79,6 +81,8 @@ export async function POST(req: Request) {
       throw new Error(`Failed to scrape: ${scrapeResult.error}`);
     }
     const content = scrapeResult.data.content;
+
+    console.log("creating response and video prompt");
 
     const [textResult, videoPrompt] = await Promise.all([
       generateObject({
