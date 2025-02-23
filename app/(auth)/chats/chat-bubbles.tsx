@@ -14,6 +14,9 @@ import ImageChatBubble from "./image-bubble";
 function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
   const [localAudioPosition, setLocalAudioPosition] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+  const [showedMessage, setShowedMessage] = useState(false);
+
+  console.log(localAudioPosition, showedMessage, message.state);
 
   const memoizedSetIsFinished = useCallback((value: boolean) => {
     setIsFinished(value);
@@ -28,6 +31,10 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
 
   const isCreatingVideo = message.state === "creating_video";
   const videoCreated = message.video;
+
+  useEffect(() => {
+    console.log(message);
+  }, [message]);
 
   return (
     <div
@@ -76,6 +83,9 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
                   setLocalAudioPosition={memoizedSetLocalAudioPosition}
                   audioUrl={message.audio}
                   isLoading={isLoading}
+                  setShowedMessage={setShowedMessage}
+                  showedMessage={showedMessage}
+                  state={message.state ?? ""}
                 />
               )}
 

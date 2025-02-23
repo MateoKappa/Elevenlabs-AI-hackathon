@@ -23,11 +23,18 @@ export default function ChatContent() {
   );
 
   useEffect(() => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollIntoView(false);
-    }
     setMessages(selectedChat?.messages ?? []);
   }, [selectedChat]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 250); // 1 second delay
+
+    return () => clearTimeout(timer); // Cleanup the timer on component unmount
+  }, [messages]);
 
   if (!selectedChat) {
     return (
@@ -44,25 +51,25 @@ export default function ChatContent() {
       <ChatHeader user={selectedChat.user} />
 
       <ScrollArea className="w-full h-screen py-4 relative">
-        <div ref={messagesContainerRef}>
-          <div className="flex flex-col items-start py-8 space-y-10 ">
-            {chat &&
-              chat.length > 0 &&
-              chat.map((item) => (
-                <ChatBubble
-                  message={item}
-                  type={item.type ?? "text"}
-                  key={item.id.toString()}
-                />
-              ))}
-          </div>
+        <div className="flex flex-col items-start py-8 space-y-10 ">
+          {chat &&
+            chat.length > 0 &&
+            chat.map((item) => (
+              <ChatBubble
+                message={item}
+                type={item.type ?? "text"}
+                key={item.id.toString()}
+              />
+            ))}
         </div>
+        <div ref={messagesContainerRef} />
       </ScrollArea>
 
       <Input
         messages={messages}
         setMessages={setMessages}
         roomId={roomId ?? ""}
+        messagesContainerRef={messagesContainerRef}
       />
 
       {/* <UserDetailSheet user={selectedChat.user} /> */}
