@@ -1,10 +1,7 @@
 import { cn } from "@/lib/utils";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { PauseCircle, PlayCircle } from "lucide-react";
-import MessageStatusIcon from "./message-status-icon";
-import { useWavesurfer } from "@wavesurfer/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import { useCallback } from "react";
 import type { Tables } from "@/db/database.types";
 import AudioBubble from "./audio-bubble";
@@ -15,8 +12,6 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
   const [localAudioPosition, setLocalAudioPosition] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [showedMessage, setShowedMessage] = useState(false);
-
-  console.log(localAudioPosition, showedMessage, message.state);
 
   const memoizedSetIsFinished = useCallback((value: boolean) => {
     setIsFinished(value);
@@ -31,10 +26,6 @@ function TextChatBubble({ message }: { message: Tables<"chat_history"> }) {
 
   const isCreatingVideo = message.state === "creating_video";
   const videoCreated = message.video;
-
-  useEffect(() => {
-    console.log(message);
-  }, [message]);
 
   return (
     <div

@@ -114,7 +114,7 @@ export default function ChatInput({
       type: type,
     });
 
-    const chatResponse = await fetch("/api/scrape", {
+    const chatResponse = await fetch("/api/ai-response", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
