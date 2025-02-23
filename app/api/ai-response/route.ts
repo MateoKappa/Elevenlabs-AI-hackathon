@@ -19,6 +19,8 @@ const schema = z.object({
 
 export const runtime = "edge";
 
+export const maxDuration = 120;
+
 export async function POST(req: Request) {
   try {
     const { userMessage, roomUuid, image } = await req.json();
