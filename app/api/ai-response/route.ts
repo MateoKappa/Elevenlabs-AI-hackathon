@@ -17,7 +17,7 @@ const schema = z.object({
   images: z.array(z.string()),
 });
 
-export const runtime = "node";
+export const runtime = "nodejs";
 
 export const maxDuration = 300;
 
