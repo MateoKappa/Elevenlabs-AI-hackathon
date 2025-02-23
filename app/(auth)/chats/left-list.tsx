@@ -1,34 +1,47 @@
 "use client";
 
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 
 import { Search } from "lucide-react";
 import ChatListItem from "./list-item";
 import { SelectedChatContext } from "@/components/contexts";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useEffect } from "react";
 import type { ChatRoomProps } from "@/types";
 
-export default function ChatList({ rooms }: { rooms: ChatRoomProps[] }) {
+export default function ChatList({
+  rooms: initialRooms,
+}: {
+  rooms: ChatRoomProps[];
+}) {
   const context = useContext(SelectedChatContext);
-  const { selectedChat, setSelectedChat } = context || { selectedChat: null };
-  const [filteredChats, setFilteredChats] = useState(rooms);
-
-  const changeHandle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = e.target.value.trim();
-
-    const filteredItems = rooms.filter((room) =>
-      room.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredChats(filteredItems);
+  const { selectedChat, setSelectedChat, rooms, setRooms } = context || {
+    selectedChat: null,
+    rooms: [],
   };
+  const [searchTerm, setSearchTerm] = useState("");
 
+  // Initialize rooms state with initial rooms if rooms is empty
   useEffect(() => {
-    if (rooms.length > 0 && setSelectedChat) {
+    if (initialRooms.length > 0 && (!rooms || rooms.length === 0) && setRooms) {
+      setRooms(initialRooms);
+    }
+  }, [initialRooms, rooms, setRooms]);
+
+  // Set initial selected chat if none is selected
+  useEffect(() => {
+    if (rooms.length > 0 && !selectedChat && setSelectedChat) {
       setSelectedChat(rooms[0]);
     }
-  }, [rooms, setSelectedChat]);
+  }, [rooms, selectedChat, setSelectedChat]);
+
+  const filteredChats = rooms.filter((room) =>
+    room.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value.trim());
+  };
 
   return (
     <>
@@ -38,7 +51,8 @@ export default function ChatList({ rooms }: { rooms: ChatRoomProps[] }) {
           type="text"
           className="ps-10"
           placeholder="Chats search..."
-          onChange={changeHandle}
+          onChange={handleSearch}
+          value={searchTerm}
         />
       </div>
 

@@ -28,6 +28,14 @@ import { createClient } from "@/supabase/client";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isSignedIn, setIsSignedIn] = React.useState(false);
+  const supabase = createClient();
+
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
+      setIsSignedIn(!!session);
+    }
+  });
 
   return (
     <header className="sticky top-2 lg:top-5 z-40 mb-10">
@@ -101,20 +109,22 @@ export const Navbar = () => {
           <div className="hidden lg:flex">
             <ToggleTheme />
 
-            <Button
-              asChild
-              size="sm"
-              className="ms-2"
-              aria-label="Join"
-            >
-              <Link
-                aria-label="Join"
-                href="/login"
-                target="_blank"
+            {isSignedIn ? (
+              <Button
+                size="sm"
+                className="ms-2"
+                aria-label="Sign Out"
+                onClick={() => supabase.auth.signOut()}
               >
-                Join
-              </Link>
-            </Button>
+                Sign Out
+              </Button>
+            ) : (
+              <Button asChild size="sm" className="ms-2" aria-label="Join">
+                <Link aria-label="Join" href="/login" target="_blank">
+                  Join
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>

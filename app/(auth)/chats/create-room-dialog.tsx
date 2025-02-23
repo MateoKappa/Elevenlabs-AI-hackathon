@@ -1,5 +1,6 @@
 "use client";
 
+import { SelectedChatContext } from "@/components/contexts";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -12,18 +13,38 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SelectedChatContextType } from "@/types";
 import { createRoom } from "@/server-actions/chats";
 import { PlusCircleIcon } from "lucide-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 function CreateRoomDialog() {
   const [roomName, setRoomName] = useState("");
   const [open, setOpen] = useState(false);
+  const { rooms, setRooms, setSelectedChat } = useContext(
+    SelectedChatContext
+  ) as SelectedChatContextType;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    await createRoom(roomName);
+    const newRoom = await createRoom(roomName);
+
+    if (newRoom?.[0] && setRooms) {
+      const newRoomData = {
+        ...newRoom[0],
+        messages: [],
+        last_message: undefined,
+        user: {
+          id: newRoom[0].user_uuid,
+          name: "",
+          avatar: "",
+        },
+      };
+
+      setRooms([newRoomData, ...rooms]);
+      setSelectedChat(newRoomData);
+    }
 
     setRoomName("");
     setOpen(false);

@@ -20,6 +20,7 @@ export async function getChats() {
       .from("rooms")
       .select("*")
       .eq("user_uuid", user.user.id)
+      .order("created_at", { ascending: false })
       .throwOnError();
 
     if (!rooms || rooms.length === 0) {
@@ -80,7 +81,6 @@ export async function validateAndUpsertChatRow(
   }
 }
 
-
 export async function validateAndUpdateChatRow(
   roomId: string,
   updates: Partial<Tables<"chat_history">>
@@ -120,11 +120,14 @@ export async function createRoom(roomName: string) {
 
   if (!user) return;
 
-  await supabase
+  const { data: room } = await supabase
     .from("rooms")
     .insert({
       name: roomName.trim(),
       user_uuid: user.id,
     })
+    .select("*")
     .throwOnError();
+
+  return room;
 }

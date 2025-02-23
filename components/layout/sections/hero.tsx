@@ -15,12 +15,13 @@ export const HeroSection = () => {
               <h1>AI Podcast creator for your business</h1>
             </div>
             <p className="max-w-screen-sm mx-auto text-xl text-muted-foreground">
-              Meet our AI-powered SaaS solution to lighten your workload, increase efficiency and make more accurate decisions.
+              Meet our AI-powered SaaS solution to lighten your workload,
+              increase efficiency and make more accurate decisions.
             </p>
             <div className="space-y-4 md:space-y-0 md:space-x-4">
               <Button asChild className="w-5/6 md:w-1/4 font-bold group/arrow">
                 <Link href="/chats">
-                  Get Started
+                  Go to studio
                   <ArrowRight className="size-5 ml-2 group-hover/arrow:translate-x-1 transition-transform" />
                 </Link>
               </Button>

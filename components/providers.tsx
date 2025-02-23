@@ -8,11 +8,7 @@ import {
   SelectedContactContext,
   SelectedStatusContext,
 } from "./contexts";
-import type {
-  ChatRoomProps,
-  StatusItemProps,
-  UserPropsTypes,
-} from "@/types";
+import type { ChatRoomProps, StatusItemProps, UserPropsTypes } from "@/types";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [show, setShow] = useState(false);
@@ -23,6 +19,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const [selectedStatus, setSelectedStatus] = useState<StatusItemProps | null>(
     null
   );
+  const [rooms, setRooms] = useState<ChatRoomProps[]>([]);
 
   return (
     <ThemeProvider
@@ -32,7 +29,14 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange
     >
       <UserProfileContext.Provider value={{ show, setShow }}>
-        <SelectedChatContext.Provider value={{ selectedChat, setSelectedChat }}>
+        <SelectedChatContext.Provider
+          value={{
+            selectedChat,
+            setSelectedChat,
+            rooms,
+            setRooms,
+          }}
+        >
           <SelectedContactContext.Provider
             value={{ selectedContact, setSelectedContact }}
           >

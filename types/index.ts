@@ -80,6 +80,8 @@ export interface UserProfileContextType {
 export interface SelectedChatContextType {
   selectedChat: ChatRoomProps | null;
   setSelectedChat: Dispatch<SetStateAction<ChatRoomProps | null>>;
+  rooms: ChatRoomProps[];
+  setRooms: Dispatch<SetStateAction<ChatRoomProps[]>>;
 }
 
 export interface SelectedContactContextType {
