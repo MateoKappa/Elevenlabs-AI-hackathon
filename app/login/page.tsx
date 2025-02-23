@@ -14,7 +14,7 @@ export default function Page() {
       </div>
 
       <Button
-        onClick={loginWithGithub}
+        onClick={() => loginWithGithub(origin)}
         variant="outline"
         className="w-full"
       >

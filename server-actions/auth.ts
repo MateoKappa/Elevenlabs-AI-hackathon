@@ -13,13 +13,13 @@ const getURL = () => {
   return url;
 };
 
-export async function loginWithGithub() {
+export async function loginWithGithub(origin: string) {
   const supabase = createClient();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "github",
     options: {
-      redirectTo: `${getURL()}/api/auth/callback`,
+      redirectTo: `${origin}/api/auth/callback`,
     },
   });
 
@@ -35,6 +35,6 @@ export async function getUser() {
 
 export async function logout() {
   const supabase = createClient();
-  
+
   await supabase.auth.signOut();
 }
