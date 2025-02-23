@@ -25,7 +25,6 @@ export default function ChatFooter({
   setMessages,
 }: {
   setMessages: React.Dispatch<React.SetStateAction<Tables<"chat_history">[]>>;
-  setCurrentAudioPosition: (position: number) => void;
   messages: Tables<"chat_history">[];
 }) {
   const [inputValue, setInputValue] = useState("");
@@ -97,7 +96,6 @@ export default function ChatFooter({
     });
 
     const [audioBuffer, videoResult] = await Promise.all([
-      // Text to speech request
       fetch("/api/text-to-speech", {
         method: "POST",
         headers: {
@@ -155,7 +153,12 @@ export default function ChatFooter({
   };
 
   return (
-    <form onSubmit={onSubmit}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit();
+      }}
+    >
       <Card>
         <CardContent className="p-2 lg:p-4 flex items-center relative">
           <Input

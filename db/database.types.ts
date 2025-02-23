@@ -14,7 +14,7 @@ export type Database = {
           audio: string | null
           content: string | null
           created_at: string
-          id: number
+          id: string
           own_message: boolean
           room_uuid: string
           state: string | null
@@ -25,7 +25,7 @@ export type Database = {
           audio?: string | null
           content?: string | null
           created_at?: string
-          id?: number
+          id?: string
           own_message?: boolean
           room_uuid: string
           state?: string | null
@@ -36,7 +36,7 @@ export type Database = {
           audio?: string | null
           content?: string | null
           created_at?: string
-          id?: number
+          id?: string
           own_message?: boolean
           room_uuid?: string
           state?: string | null

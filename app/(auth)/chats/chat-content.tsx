@@ -12,6 +12,7 @@ import ChatBubble from "./chat-bubbles";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SelectedChatContext } from "@/components/contexts";
 import UserDetailSheet from "./user-detail-sheet";
+import { Tables } from "@/db/database.types";
 
 export default function ChatContent() {
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
@@ -19,15 +20,15 @@ export default function ChatContent() {
     SelectedChatContext
   ) as SelectedChatContextType;
 
-  const [messages, setMessages] = useState<ChatRoomProps["messages"]>(
-    selectedChat?.messages
+  const [messages, setMessages] = useState<Tables<"chat_history">[]>(
+    selectedChat?.messages ?? []
   );
 
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollIntoView(false);
     }
-    setMessages(selectedChat?.messages);
+    setMessages(selectedChat?.messages ?? []);
   }, [selectedChat]);
 
   if (!selectedChat) {
@@ -48,6 +49,8 @@ export default function ChatContent() {
   }
 
   const chat = messages;
+
+  console.log(!!chat, chat, chat.length, chat.length > 0);
 
   return (
     <div className="flex flex-col z-50 inset-0 bg-background lg:bg-transparent fixed lg:relative p-4 lg:p-0">

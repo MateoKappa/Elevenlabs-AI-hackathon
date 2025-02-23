@@ -1,6 +1,6 @@
 "use client";
 
-import { reviewList } from "@/data/reviews";
+import { reviewList } from "@/components/reviews";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,

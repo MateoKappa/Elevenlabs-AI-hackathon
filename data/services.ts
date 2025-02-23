@@ -11,39 +11,39 @@ interface ServiceProps {
 
 export const serviceList: ServiceProps[] = [
   {
-    title: "Consultation Services",
+    title: "Content Analysis",
     description:
-      "Expert guidance tailored to identify opportunities and strategize effectively.",
+      "Smart analysis of your articles to identify key themes and narrative structures.",
     pro: 0,
   },
   {
-    title: "Custom Domain Integration",
+    title: "Custom Voice Selection",
     description:
-      "Seamless integration of your unique domain for a professional online presence.",
+      "Choose from a variety of AI voices to match your content's tone and style.",
     pro: 0,
   },
   {
-    title: "Social Media Integrations",
+    title: "Multi-Platform Export",
     description:
-      "Connect with popular platforms to enhance your online engagement and reach.",
+      "Export your podcasts in multiple formats for different platforms and uses.",
     pro: 0,
   },
   {
-    title: "Email Marketing Integrations",
+    title: "Advanced Video Customization",
     description:
-      "Effortlessly connect email marketing tools to streamline your campaigns.",
+      "Customize video styles and themes to match your brand identity.",
     pro: 1,
   },
   {
-    title: "SEO Optimization",
+    title: "Batch Processing",
     description:
-      "Improve your search engine visibility with tailored optimization strategies.",
+      "Convert multiple articles into podcasts simultaneously for efficient content creation.",
     pro: 1,
   },
   {
-    title: "Ongoing Support",
+    title: "Priority Generation",
     description:
-      "24/7 customer support to ensure smooth operations and address any issues.",
+      "Get faster processing times and priority access to new AI features.",
     pro: 1,
   },
 ];

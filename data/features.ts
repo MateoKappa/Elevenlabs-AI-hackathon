@@ -7,38 +7,38 @@ interface FeaturesProps {
 export const featureList: FeaturesProps[] = [
   {
     icon: "TabletSmartphone",
-    title: "AI-Powered Task Management",
+    title: "Smart Content Extraction",
     description:
-      "Utilize machine learning algorithms to prioritize tasks, ensuring your team focuses on what matters most.",
+      "Advanced AI-powered scraping that intelligently extracts and transforms any article into an engaging, story-focused narrative.",
   },
   {
     icon: "BadgeCheck",
-    title: "Predictive Analytics",
+    title: "AI Voice Narration",
     description:
-      "Leverage historical data to forecast trends and make proactive decisions, minimizing risks and maximizing opportunities.",
+      "Professional text-to-speech technology that automatically converts your content into natural-sounding audio narration.",
   },
   {
     icon: "Goal",
-    title: "Custom Workflow Automation",
+    title: "Auto Video Generation",
     description:
-      "Design automated workflows tailored to your processes, integrating multiple tools to streamline operations seamlessly.",
+      "Creates compelling short-form videos with AI-generated visuals that match your content's theme and message.",
   },
   {
     icon: "PictureInPicture",
-    title: "Robust API Integrations",
+    title: "Story Transformation",
     description:
-      "Easily connect our platform with your existing software solutions, enabling data synchronization and enhancing functionality.",
+      "Automatically restructures content into a conversational narrative optimized for audio listening and engagement.",
   },
   {
     icon: "MousePointerClick",
-    title: "Interactive Dashboards",
+    title: "Synchronized Playback",
     description:
-      "Visualize key performance indicators (KPIs) and metrics in real-time with customizable dashboards that provide actionable insights.",
+      "Interactive audio player with synchronized text highlighting for an enhanced listening experience.",
   },
   {
     icon: "Lock",
-    title: "Privacy and Compliance",
+    title: "Universal Link Support",
     description:
-      "Ensure your data is protected with end-to-end encryption and compliance with regulations such as GDPR and CCPA.",
+      "Simply paste any article link and watch as it transforms into a multimedia podcast experience with audio and video.",
   },
 ];

@@ -20,6 +20,8 @@ export async function POST(req: Request) {
   try {
     const { userMessage } = await req.json();
 
+    console.log("generating response", userMessage);
+
     const {
       object: {
         actions: { instructions, url, message, success },
@@ -57,6 +59,8 @@ export async function POST(req: Request) {
         Instructions: "Focus on extracting content specifically about ElevenLabs. Look for sections, headings, or content blocks that mention ElevenLabs, their products, features, or services. Ignore content about other companies or tools."`,
     });
 
+    console.log("scraping");
+
     if (!success) {
       return NextResponse.json({
         success: false,
@@ -78,6 +82,8 @@ export async function POST(req: Request) {
       throw new Error(`Failed to scrape: ${scrapeResult.error}`);
     }
     const content = scrapeResult.data.content;
+
+    console.log("generating text");
 
     const [textResult, videoPrompt] = await Promise.all([
       generateObject({
