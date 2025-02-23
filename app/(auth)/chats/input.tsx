@@ -126,7 +126,7 @@ export default function ChatFooter({
       (async () => {
         return fal.subscribe("fal-ai/minimax/video-01-live", {
           input: {
-            prompt: text.slice(0, 150),
+            prompt: video_prompt,
             prompt_optimizer: true,
           },
           logs: true,

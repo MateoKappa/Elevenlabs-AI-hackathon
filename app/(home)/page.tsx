@@ -26,7 +26,6 @@ export default function Home() {
       <TeamSection />
       <PricingSection />
       <CommunitySection />
-      <ContactSection />
       <FAQSection />
       <NewsletterSection />
       <FooterSection />

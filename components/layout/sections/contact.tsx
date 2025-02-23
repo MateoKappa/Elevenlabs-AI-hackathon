@@ -71,9 +71,7 @@ export const ContactSection = () => {
                 <Building2 className="size-5" />
                 <div className="font-bold">Location:</div>
               </div>
-              <div className="text-muted-foreground">
-                123 Maple Lane, Springfield, IL 62704
-              </div>
+              <div className="text-muted-foreground">Greece, Thessaloniki</div>
             </div>
 
             <div>
