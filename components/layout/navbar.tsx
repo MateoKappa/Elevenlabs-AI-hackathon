@@ -1,7 +1,7 @@
 "use client";
 
 import { Menu } from "lucide-react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -106,7 +106,7 @@ export const Navbar = () => {
             </NavigationMenuList>
           </NavigationMenu>
 
-          <div className="hidden lg:flex">
+          <div className="flex">
             <ToggleTheme />
 
             {isSignedIn ? (
