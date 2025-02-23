@@ -98,7 +98,7 @@ export default function ChatInput({
     });
 
     const [_audioBuffer, videoResult] = await Promise.all([
-      fetch("/api/text-to-speech", {
+      await fetch("/api/text-to-speech", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -126,15 +126,12 @@ export default function ChatInput({
 
           return audioUrl;
         }),
+
       (async () => {
         return fal.subscribe("fal-ai/minimax/video-01-live", {
           input: {
             prompt: video_prompt,
             prompt_optimizer: true,
-          },
-          logs: true,
-          onQueueUpdate: (update) => {
-            // console.log(update);
           },
         });
       })(),
