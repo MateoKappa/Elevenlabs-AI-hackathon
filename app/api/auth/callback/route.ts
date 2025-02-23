@@ -3,12 +3,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/supabase/server";
 
 const getURL = () => {
-  const isDevelopment = process.env.VERCEL_ENV !== "production";
-
-  let url =
-    process?.env?.VERCEL_URL ??
-    process?.env?.VERCEL_BRANCH_URL ??
-    "http://localhost:3000/";
+  let url = process?.env?.SITE_URL ?? "http://localhost:3000/";
 
   url = url.startsWith("http") ? url : `https://${url}`;
   url = url.endsWith("/") ? url : `${url}/`;
