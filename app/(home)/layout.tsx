@@ -8,7 +8,6 @@ export default function ChatsLayout({
 }) {
   return (
     <Providers>
-      {" "}
       <Navbar />
       {children}
     </Providers>

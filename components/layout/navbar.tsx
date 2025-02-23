@@ -1,7 +1,7 @@
 "use client";
 
-import { type icons, Menu } from "lucide-react";
-import React from "react";
+import { Menu } from "lucide-react";
+import React, { useEffect } from "react";
 import {
   Sheet,
   SheetContent,
@@ -13,11 +13,9 @@ import {
 import { Separator } from "../ui/separator";
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "../ui/navigation-menu";
 import { Button } from "../ui/button";
@@ -25,8 +23,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ToggleTheme } from "./toogle-theme";
 import Logo from "./logo";
-import { productList, routeList } from "@/data/navbar";
-import { Icon } from "../ui/extras/icon";
+import { routeList } from "@/data/navbar";
+import { createClient } from "@/supabase/client";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -111,7 +109,7 @@ export const Navbar = () => {
             >
               <Link
                 aria-label="Join"
-                href="/auth"
+                href="/login"
                 target="_blank"
               >
                 Join
