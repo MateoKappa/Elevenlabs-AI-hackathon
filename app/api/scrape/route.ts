@@ -80,7 +80,7 @@ export async function POST(req: Request) {
 
     if (!success) {
       const message = "Your message was not clear, please try again.";
-      const chat = await validateAndUpsertChatRow(roomUuid, {
+      await validateAndUpsertChatRow(roomUuid, {
         content: message,
         type: "TEXT",
         own_message: false,
@@ -92,7 +92,6 @@ export async function POST(req: Request) {
       });
     }
 
-    console.log("scraping url");
     const scrapeResult = await firecrawl.extract([url], {
       prompt: `Extract specific content from the page based on these instructions:
         ${instructions}

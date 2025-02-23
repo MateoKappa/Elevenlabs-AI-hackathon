@@ -28,12 +28,6 @@ export default function ChatContent() {
     setMessages(selectedChat?.messages ?? []);
   }, [selectedChat]);
 
-  useEffect(() => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
-
   if (!selectedChat) {
     return (
       <figure className="text-center h-full hidden lg:flex items-center justify-center">
@@ -47,18 +41,19 @@ export default function ChatContent() {
   return (
     <div className="h-full flex justify-between flex-col z-50 inset-0 bg-background lg:bg-transparent fixed lg:relative p-4 lg:p-0">
       <ScrollArea className="w-full h-screen py-4 relative">
-        <div className="flex flex-col items-start py-8 space-y-10 ">
-          {chat &&
-            chat.length > 0 &&
-            chat.map((item) => (
-              <ChatBubble
-                message={item}
-                type={item.type ?? "text"}
-                key={item.id.toString()}
-              />
-            ))}
+        <div ref={messagesContainerRef}>
+          <div className="flex flex-col items-start py-8 space-y-10 ">
+            {chat &&
+              chat.length > 0 &&
+              chat.map((item) => (
+                <ChatBubble
+                  message={item}
+                  type={item.type ?? "text"}
+                  key={item.id.toString()}
+                />
+              ))}
+          </div>
         </div>
-        <div ref={messagesContainerRef} />
       </ScrollArea>
 
       <Input
